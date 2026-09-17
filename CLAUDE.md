@@ -1,6 +1,6 @@
 # np-aspire
 
-Nx monorepo for the np-aspire **Angular frontend** (apps + shared libs). The backend — .NET API, Aspire AppHost, NGINX gateway, docker-compose, and Auth0/Terraform — lives in https://github.com/natepaxton/np-aspire-api (split on 2026-09-17; combined state tagged `pre-api-split`).
+Nx monorepo for the np-aspire **Angular frontend** (apps + shared libs). The backend — .NET API, Aspire AppHost (its only orchestration source), and Auth0/Terraform — lives in https://github.com/natepaxton/np-aspire-api (split on 2026-09-17; combined state tagged `pre-api-split`).
 
 Full spec, architecture, and open decisions: @docs/spec.md
 
@@ -8,8 +8,8 @@ Full spec, architecture, and open decisions: @docs/spec.md
 
 - **Frontend:** Angular (latest stable) via `@nx/angular`, spartan/ui (brain + helm, Mira style, neutral theme), Tailwind CSS v4, SCSS component styles, Jest unit tests, Playwright e2e
 - **Auth:** Auth0 via `@auth0/auth0-angular` (the API validates tokens and enforces access)
-- **Backend contract:** the np-aspire-api OpenAPI document; the API client is generated from it (milestone 3)
-- **Delivery:** static-site container image on GHCR, run by np-aspire-api's compose file behind its NGINX gateway (milestone 2)
+- **Backend contract:** the np-aspire-api OpenAPI document; the API client is generated from it (milestone 2)
+- **Delivery:** production packaging/hosting is TBD (decided with np-aspire-api's deployment target); no gateway yet
 - **CI:** GitHub Actions (`.github/workflows/`), Codecov
 
 ## Layout
@@ -23,7 +23,7 @@ Full spec, architecture, and open decisions: @docs/spec.md
 
 - Install: `npm install` (npm blocks unreviewed install scripts; approve known build tools with `npm approve-scripts <pkg>`, recorded name-only under `allowScripts` in `package.json`)
 - Serve sandbox: `npx nx serve sandbox` → http://localhost:4300 (4200 is avoided on purpose)
-- Backend for local dev (in np-aspire-api): `dotnet run --project src/NpAspire.AppHost`, or the container stack `docker compose up --build --detach --wait` (gateway on http://localhost:8080)
+- Backend for local dev (in np-aspire-api): `dotnet run --project src/NpAspire.AppHost` (API on http://localhost:5104)
 - Lint / test / build everything: `npx nx run-many -t lint test build`
 - Affected only: `npx nx affected -t lint test build`
 - Test with coverage (as CI does): `npx nx run-many -t test --configuration=ci`
@@ -43,11 +43,11 @@ Full spec, architecture, and open decisions: @docs/spec.md
 - Shared UI goes in `libs/ui`, not duplicated across apps. Build it from helm primitives; add primitives with `npx nx g @spartan-ng/cli:ui <name>` (style `mira` and location `libs/helm` come from `components.json`; don't override them).
 - Styling: Tailwind utilities in templates; component styles are SCSS. Global app stylesheets are plain `styles.css` (Tailwind v4 can't go through Sass) that import `libs/ui/src/styles/theme.css` and declare `@source` paths (automatic source detection is off). Design tokens are the Spartan theme CSS variables — don't duplicate them as SCSS variables. Prefer utilities over `@apply`.
 - `sandbox` is a dev test bed. Keep its UI minimal and functional.
-- Call the backend only through the gateway using relative URLs (`/api/v1/...`). Never hardcode hosts/ports; in dev the Angular proxy forwards `/api` to the gateway.
+- Call the backend only with relative URLs (`/api/v1/...`). Never hardcode hosts/ports; in dev the Angular proxy forwards `/api` to the API (http://localhost:5104). There is no gateway yet — relative URLs keep a future one transparent.
 - Use the generated API client and types (from np-aspire-api's OpenAPI document); never hand-write API types or permission strings.
 - Auth: Authorization Code + PKCE via `@auth0/auth0-angular`; tokens in memory with refresh token rotation; the interceptor's `allowedList` covers only `/api/*`.
 - Angular never decides access and never decodes access tokens; it hides/shows UI based on `permissions` returned by `GET /api/v1/users/me`. Route guards are UX only — the API enforces everything.
-- Backend changes (endpoints, permissions, roles, Auth0 settings, gateway, compose) belong in np-aspire-api, not here.
+- Backend changes (endpoints, permissions, roles, Auth0 settings, orchestration) belong in np-aspire-api, not here.
 - Coverage minimums are enforced by Jest `coverageThreshold` (libs 80/80/80/75, `sandbox` 60/60/60/50 for lines/statements/functions/branches). Never lower a threshold to make CI pass — add tests. New projects with tests need `collectCoverageFrom` + `coverageThreshold` in their Jest config and a component in `codecov.yml`.
 - Upgrade Nx/Angular majors with `npx nx migrate latest` (then `npm install` and `npx nx migrate --run-migrations`), Spartan with its CLI `migrate-*` generators — never by hand-editing versions. Dependabot ignores those majors on purpose.
 - Files use LF line endings (`.gitattributes`).
