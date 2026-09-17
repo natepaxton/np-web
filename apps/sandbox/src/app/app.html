@@ -1,0 +1,24 @@
+<div class="flex min-h-screen">
+  <aside class="w-56 shrink-0 border-r bg-sidebar p-4 text-sidebar-foreground">
+    <p class="mb-4 text-sm font-semibold" data-testid="app-name">np-aspire sandbox</p>
+    <nav aria-label="Main">
+      <ul class="flex flex-col gap-1">
+        @for (item of navItems; track item.path) {
+        <li>
+          <a
+            class="block rounded-md px-2 py-1 text-xs hover:bg-sidebar-accent"
+            [routerLink]="item.path"
+            routerLinkActive="bg-sidebar-accent font-medium"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            {{ item.label }}
+          </a>
+        </li>
+        }
+      </ul>
+    </nav>
+  </aside>
+  <main class="flex-1 p-6">
+    <router-outlet />
+  </main>
+</div>

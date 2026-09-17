@@ -1,0 +1,14 @@
+<section hlmCard>
+  <header hlmCardHeader>
+    <h2 hlmCardTitle>{{ title() }}</h2>
+    @if (description(); as description) {
+    <p hlmCardDescription>{{ description }}</p>
+    }
+  </header>
+  <div hlmCardContent>
+    <ng-content />
+  </div>
+  <footer hlmCardFooter>
+    <ng-content select="[panelFooter]" />
+  </footer>
+</section>
