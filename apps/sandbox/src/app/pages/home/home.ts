@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Panel } from '@np-aspire/ui';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmInput } from '@spartan-ng/helm/input';
+import { API_BASE_URL } from '../../api';
 
 /** How the last `/api/v1/auth/check` call went, ready to display. */
 interface CheckResult {
@@ -18,6 +19,7 @@ interface CheckResult {
 })
 export class Home {
   private readonly http = inject(HttpClient);
+  private readonly apiBase = inject(API_BASE_URL);
 
   protected readonly name = signal('');
   protected readonly greeting = signal<string | null>(null);
@@ -38,7 +40,7 @@ export class Home {
     this.checking.set(true);
     this.checkResult.set(null);
 
-    this.http.get('/api/v1/auth/check', { observe: 'response', responseType: 'text' }).subscribe({
+    this.http.get(`${this.apiBase}/api/v1/auth/check`, { observe: 'response', responseType: 'text' }).subscribe({
       next: (response) => {
         this.checking.set(false);
         this.checkResult.set({ ok: true, message: `${response.status} — ${response.body ?? ''}` });
