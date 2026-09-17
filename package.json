@@ -37,7 +37,7 @@
     "jest-environment-jsdom": "~30.5.1",
     "jest-preset-angular": "~17.0.0",
     "jest-util": "~30.5.1",
-    "jsonc-eslint-parser": "^2.1.0",
+    "jsonc-eslint-parser": "^3.3.0",
     "ng-packagr": "~22.1.0",
     "nx": "23.2.1",
     "postcss": "^8.5.28",
