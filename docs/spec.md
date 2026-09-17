@@ -341,6 +341,8 @@ The test tools enforce the minimums, so CI and local runs fail the same way. Cod
 - No force pushes or deletions.
 - The rules apply to admins too.
 
+**Secret scanning:** secret scanning and push protection are enabled (free for public repositories). A push that contains a recognized secret, such as an Auth0 client secret, is blocked. The optional non-provider patterns and validity checks require GitHub Secret Protection (paid), so they stay off.
+
 **Dependabot**
 
 - **Alerts and security updates:** enabled in the repository settings. Security fixes arrive as one grouped PR.
