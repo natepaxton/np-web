@@ -342,7 +342,7 @@ The test tools enforce the minimums, so CI and local runs fail the same way. Cod
   - Reporters: `lcov` (for Codecov), `json-summary`, and `text-summary`.
 - **.NET:**
   - `coverlet.MTP` collects coverage (`dotnet test --coverlet`). Its settings are in each test project's `testconfig.json`.
-  - ReportGenerator merges the results into `coverage/<project path>/Cobertura.xml` (uploaded to Codecov) and `Summary.json`.
+  - ReportGenerator merges the results into `coverage/<project path>/cobertura.xml` (uploaded to Codecov) and `Summary.json`.
   - Neither tool can enforce a minimum on Microsoft Testing Platform, so `tools/scripts/dotnet-test-coverage.mjs` runs all three steps and fails below the minimums (lines, branches, methods).
   - It runs as the `test:ci` configuration: `npx nx test NpAspire.Api.Tests --configuration=ci`.
 - **Excluded from coverage:**
