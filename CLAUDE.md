@@ -27,7 +27,7 @@ Full spec, architecture, and open decisions: @docs/spec.md
 
 ## Commands
 
-- Install: `npm install` (npm blocks unreviewed install scripts; approve known build tools with `npm approve-scripts <pkg>`, recorded under `allowScripts` in `package.json`)
+- Install: `npm install` (npm blocks unreviewed install scripts; approve known build tools with `npm approve-scripts <pkg>`, recorded name-only under `allowScripts` in `package.json`)
 - Serve sandbox: `npx nx serve sandbox` → http://localhost:4300 (4200 is avoided on purpose)
 - Lint / test / build everything: `npx nx run-many -t lint test build`
 - Affected only: `npx nx affected -t lint test build`
@@ -71,5 +71,7 @@ Full spec, architecture, and open decisions: @docs/spec.md
 - The AppHost is the source of truth for topology. Never hand-edit `deploy/compose/`; change the AppHost and re-publish.
 - Let `@nx/dotnet` infer .NET targets; only add `nx:run-commands` targets for things it can't infer.
 - Coverage minimums are enforced by the test tools: Jest `coverageThreshold` (libs 80/80/80/75, `sandbox` 60/60/60/50 for lines/statements/functions/branches), Coverlet for .NET. Never lower a threshold to make CI pass — add tests. New projects with tests need `collectCoverageFrom` + `coverageThreshold` in their Jest config and a component in `codecov.yml`.
+- Upgrade Nx/Angular majors with `npx nx migrate latest` (then `npm install` and `npx nx migrate --run-migrations`), Spartan with its CLI `migrate-*` generators — never by hand-editing versions. Dependabot ignores those majors on purpose.
+- `main` is protected: all changes go through a PR with passing CI (`Lint, test, build`, `E2E`, `codecov/patch`, `codecov/project`). Never push directly to `main`.
 - CI lives in `.github/workflows/ci.yml`; keep job names stable (`Lint, test, build`, `E2E`) because branch protection will reference them.
 - When a TBD in `docs/spec.md` gets decided, update the spec.
