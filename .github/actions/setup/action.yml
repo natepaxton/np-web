@@ -1,5 +1,5 @@
 name: Setup workspace
-description: Node, .NET, dependencies, and Nx base/head SHAs.
+description: Node, dependencies, and Nx base/head SHAs.
 
 runs:
   using: composite
@@ -9,25 +9,9 @@ runs:
         node-version-file: .tool-versions
         cache: npm
 
-    # The @nx/dotnet plugin needs the .NET SDK to build the project graph, so every job sets it up.
-    - uses: actions/setup-dotnet@v6
-      with:
-        global-json-file: global.json
-
-    - name: Cache NuGet packages
-      uses: actions/cache@v6
-      with:
-        path: ~/.nuget/packages
-        key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'dotnet-tools.json', 'global.json') }}
-        restore-keys: nuget-${{ runner.os }}-
-
     - name: Install npm dependencies
       shell: bash
       run: npm ci
-
-    - name: Restore .NET tools
-      shell: bash
-      run: dotnet tool restore
 
     # Sets NX_BASE / NX_HEAD so `nx affected` compares against the right commits.
     - uses: nrwl/nx-set-shas@v5
