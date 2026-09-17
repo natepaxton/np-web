@@ -1,0 +1,7 @@
+{
+  "componentsPath": "libs/helm",
+  "buildable": true,
+  "generateAs": "library",
+  "style": "mira",
+  "importAlias": "@spartan-ng/helm"
+}

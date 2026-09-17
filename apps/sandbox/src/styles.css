@@ -1,0 +1,6 @@
+/* Global styles for sandbox. Plain CSS: Tailwind v4 must not go through Sass. */
+@import '../../../libs/ui/src/styles/theme.css';
+
+/* Tailwind class scanning (automatic detection is disabled in the shared theme). */
+@source './';
+@source '../../../libs';
