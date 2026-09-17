@@ -1,5 +1,5 @@
 <div class="flex min-h-screen">
-  <aside class="w-56 shrink-0 border-r bg-sidebar p-4 text-sidebar-foreground">
+  <aside class="flex w-56 shrink-0 flex-col border-r bg-sidebar p-4 text-sidebar-foreground">
     <p class="mb-4 text-sm font-semibold" data-testid="app-name">np-aspire sandbox</p>
     <nav aria-label="Main">
       <ul class="flex flex-col gap-1">
@@ -17,6 +17,19 @@
         }
       </ul>
     </nav>
+    <div class="mt-auto border-t pt-4" data-testid="auth-status">
+      @if (isLoading()) {
+      <p class="text-xs text-muted-foreground">Checking session…</p>
+      } @else if (isAuthenticated()) {
+      <p class="mb-2 truncate text-xs" data-testid="auth-user">{{ user()?.email ?? user()?.name }}</p>
+      <button hlmBtn class="w-full" size="sm" variant="outline" type="button" (click)="logOut()">Log out</button>
+      } @else {
+      <div class="flex flex-col gap-2">
+        <button hlmBtn class="w-full" size="sm" type="button" (click)="logIn()">Log in</button>
+        <button hlmBtn class="w-full" size="sm" variant="outline" type="button" (click)="signUp()">Sign up</button>
+      </div>
+      }
+    </div>
   </aside>
   <main class="flex-1 p-6">
     <router-outlet />

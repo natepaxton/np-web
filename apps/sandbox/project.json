@@ -59,7 +59,8 @@
         }
       },
       "options": {
-        "port": 4300
+        "port": 4300,
+        "proxyConfig": "apps/sandbox/proxy.conf.mjs"
       }
     },
     "lint": {

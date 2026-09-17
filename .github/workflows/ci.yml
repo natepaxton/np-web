@@ -93,6 +93,10 @@ jobs:
 
       - name: E2E (affected)
         run: npx nx affected -t e2e
+        env:
+          # Dev-tenant test users, created by np-aspire-api's Terraform. The login tests skip
+          # themselves when this is empty (as it is for forks).
+          E2E_TEST_USER_PASSWORD: ${{ secrets.E2E_TEST_USER_PASSWORD }}
 
       - name: Upload Playwright report
         if: failure()

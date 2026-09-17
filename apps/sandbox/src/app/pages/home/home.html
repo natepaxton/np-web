@@ -1,7 +1,7 @@
 <h1 class="mb-4 text-lg font-semibold">Sandbox</h1>
 
 <ui-panel
-  class="max-w-md"
+  class="mb-4 max-w-md"
   title="UI check"
   description="Confirms the shared theme and helm components render. Endpoint panels will be added as the API grows."
 >
@@ -18,4 +18,21 @@
   <p class="mt-3 text-xs" data-testid="greeting">{{ greeting }}</p>
   }
   <button panelFooter hlmBtn type="button" (click)="greet()">Greet</button>
+</ui-panel>
+
+<ui-panel
+  class="max-w-md"
+  title="API auth check"
+  description="Calls GET /api/v1/auth/check. The interceptor attaches the access token; the API decides the outcome."
+>
+  @if (checkResult(); as result) {
+  <p class="text-xs" [class.text-destructive]="!result.ok" data-testid="api-check-result">
+    {{ result.status }} — {{ result.detail }}
+  </p>
+  } @else {
+  <p class="text-xs text-muted-foreground">Not called yet.</p>
+  }
+  <button panelFooter hlmBtn type="button" [disabled]="checking()" (click)="checkApiAuth()">
+    {{ checking() ? 'Calling…' : 'Call endpoint' }}
+  </button>
 </ui-panel>

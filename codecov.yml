@@ -33,6 +33,10 @@ component_management:
       name: ui
       paths:
         - libs/ui/**
+    - component_id: auth
+      name: auth
+      paths:
+        - libs/auth/**
 
 # Mirrors the exclusions in the Jest configs.
 ignore:

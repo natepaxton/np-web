@@ -6,7 +6,10 @@ export default [
   ...baseConfig,
   {
     files: ['**/*.ts', '**/*.js'],
-    // Override or add rules here
-    rules: {},
+    rules: {
+      // The login tests skip themselves when the Auth0 test password or the API is missing,
+      // which is a deliberate opt-out rather than a disabled test.
+      'playwright/no-skipped-test': ['warn', { allowConditional: true }],
+    },
   },
 ];
