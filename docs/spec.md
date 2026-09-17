@@ -332,7 +332,32 @@ The test tools enforce the minimums, so CI and local runs fail the same way. Cod
   - Uploads use the `CODECOV_TOKEN` repository secret.
   - **Every new project with tests needs** a `collectCoverageFrom` and threshold in its Jest config, and a Codecov component.
 
-**Branch protection:** planned, with required checks `Lint, test, build`, `E2E`, `codecov/patch`, and `codecov/project`. It needs GitHub Pro or a public repository (see §6).
+**Branch protection on `main`** (the repository is public, applied with `gh api`):
+
+- Changes go through a PR. No approvals are required, because this is a solo project; stale reviews are dismissed.
+- Required checks: `Lint, test, build`, `E2E`, `codecov/patch`, and `codecov/project`.
+- The branch must be up to date with `main` before merging.
+- Review conversations must be resolved.
+- No force pushes or deletions.
+- The rules apply to admins too.
+
+**Secret scanning:** secret scanning and push protection are enabled (free for public repositories). A push that contains a recognized secret, such as an Auth0 client secret, is blocked. The optional non-provider patterns and validity checks require GitHub Secret Protection (paid), so they stay off.
+
+**Dependabot**
+
+- **Alerts and security updates:** enabled in the repository settings. Security fixes arrive as one grouped PR.
+- **Version updates** (`.github/dependabot.yml`):
+  - Checked every Monday at 06:00 America/New_York, with at most 5 open PRs per ecosystem.
+  - New releases wait 3 days before being proposed (7 days for major releases).
+  - Ecosystems: `npm` and `github-actions` now; add `nuget` in milestone 2 and `terraform` in milestone 3.
+- **npm groups:** `nx`, `angular`, `ui-styling` (Spartan, Tailwind, PostCSS), and `minor-and-patch` for everything else. Other majors arrive as individual PRs.
+- **Majors Dependabot ignores**, because they are upgraded with tooling that also migrates code:
+  - Nx and Angular (`npx nx migrate latest`)
+  - Spartan (the CLI's `migrate-*` generators)
+  - `typescript` and `@types/node`, which follow Angular and Node
+- **npm install-script approvals:**
+  - `allowScripts` entries are name-only (`.npmrc`: `allow-scripts-pin=false`), so version bumps don't un-approve build tools.
+  - A dependency that adds a _new_ install script still needs `npm approve-scripts <pkg>`.
 
 ## 4. Repository layout
 
@@ -435,8 +460,6 @@ Implementation notes:
 
 ## 6. Open decisions
 
-- Branch protection: upgrade to GitHub Pro or make the repository public. The GitHub Free plan does not allow branch protection or rulesets on private repositories.
-- Dependabot configuration
 - Remote Terraform state backend (needed before CI runs `tf-apply`)
 
 ## 7. Deferred
