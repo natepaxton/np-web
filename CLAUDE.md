@@ -23,7 +23,7 @@ Full spec, architecture, and open decisions: @docs/spec.md
 
 - Install: `npm install` (npm blocks unreviewed install scripts; approve known build tools with `npm approve-scripts <pkg>`, recorded name-only under `allowScripts` in `package.json`)
 - Serve sandbox: `npx nx serve sandbox` → http://localhost:4300 (4200 is avoided on purpose)
-- Backend for local dev: run np-aspire-api's AppHost (`dotnet run --project src/NpAspire.AppHost` in that repo)
+- Backend for local dev (in np-aspire-api): `dotnet run --project src/NpAspire.AppHost`, or the container stack `docker compose up --build --detach --wait` (gateway on http://localhost:8080)
 - Lint / test / build everything: `npx nx run-many -t lint test build`
 - Affected only: `npx nx affected -t lint test build`
 - Test with coverage (as CI does): `npx nx run-many -t test --configuration=ci`

@@ -2,13 +2,13 @@
 
 Status: early draft. Sections marked **TBD** are open decisions.
 
-This repository is the **Angular frontend** of np-aspire: an Nx monorepo of Angular apps and libraries. The backend lives in **[np-aspire-api](https://github.com/natepaxton/np-aspire-api)**: the .NET API, the Aspire AppHost, the NGINX gateway, the Docker Compose output, and the Auth0 configuration (Terraform and the permissions manifest). Its `docs/spec.md` covers those parts.
+This repository is the **Angular frontend** of np-aspire: an Nx monorepo of Angular apps and libraries. The backend lives in **[np-aspire-api](https://github.com/natepaxton/np-aspire-api)**: the .NET API, the Aspire AppHost, the NGINX gateway, the Docker Compose stack (`compose.yaml`), and the Auth0 configuration (Terraform and the permissions manifest). Its `docs/spec.md` covers those parts.
 
 Until 2026-09-17 both lived here. The combined state is tagged **`pre-api-split`**. The .NET history was moved to np-aspire-api with `git filter-repo`.
 
 ## 1. Goal
 
-An Nx monorepo for Angular apps and shared libraries. The apps talk to the np-aspire-api backend through its NGINX gateway, and they ship as a static-site container image that the backend's Aspire-generated `docker compose` file runs.
+An Nx monorepo for Angular apps and shared libraries. The apps talk to the np-aspire-api backend through its NGINX gateway, and they ship as a static-site container image that the backend's `compose.yaml` runs behind the gateway.
 
 ## 2. How the frontend fits the system
 
@@ -24,9 +24,10 @@ An Nx monorepo for Angular apps and shared libraries. The apps talk to the np-as
 - **All browser traffic goes through the gateway.** Apps call the backend with **relative URLs** (`/api/v1/...`) and never use hardcoded hosts or ports.
 - **Same origin:** the frontend and the API share one origin, so no CORS setup is needed.
 - **Local development:**
-  - Run the backend with np-aspire-api's AppHost. It serves the gateway on a fixed host port, planned `8080`.
-  - Run `npx nx serve sandbox` here. The dev server's proxy config (`proxy.conf.json`, added in milestone 3) forwards `/api` to the gateway, so dev routing matches production.
-- **Containers:** each deployable app is built into a static-site image, served by NGINX with an SPA fallback, and published to GHCR (milestone 2). np-aspire-api's AppHost references the image, so its generated compose file includes the frontend.
+  - Run the backend with np-aspire-api, either as its Aspire AppHost or as its compose stack. The compose stack puts the gateway on `http://localhost:8080`.
+  - Run `npx nx serve sandbox` here. The dev server's proxy config (`proxy.conf.json`, added in milestone 3) forwards `/api` to the backend.
+  - Whether the proxy targets the gateway or the API directly depends on an open decision in np-aspire-api.
+- **Containers:** each deployable app is built into a static-site image, served by NGINX with an SPA fallback, and published to GHCR (milestone 2). np-aspire-api's `compose.yaml` will add it as the `web` service, and the gateway's `/` will proxy to it.
 
 ## 3. Components
 
@@ -203,7 +204,7 @@ This follows Nx conventions: deployable projects go in `apps/`, and shared libra
 ## 6. Open decisions
 
 - **API client generation:** the generator (for example `ng-openapi-gen` or `@hey-api/openapi-ts`), and where the OpenAPI document comes from: a copy committed and checked in CI, a release artifact from np-aspire-api, or a running API.
-- **Static-site image:** name, tag scheme, and base image. It must be coordinated with np-aspire-api's AppHost.
+- **Static-site image:** name, tag scheme, and base image. It must be coordinated with np-aspire-api's `compose.yaml` and AppHost.
 - **E2E credentials:** how the Playwright tests get the dev-tenant test-user passwords (GitHub secrets in this repo, matching np-aspire-api's Terraform variables).
 
 ## 7. Milestones
