@@ -464,6 +464,8 @@ Implementation notes:
 
 ## 7. Deferred
 
+- **Remove the `smol-toml` npm override** (`overrides` in `package.json`) once Nx itself depends on `smol-toml` ≥ 1.7.1. It was added to fix Dependabot alert #1, a denial-of-service issue in `smol-toml` ≤ 1.7.0, because `nx@23.2.1` pins 1.6.1. To check: `npm ls smol-toml` shows the version Nx requests.
+
 - **In-app role management.** An admin UI that assigns Auth0 roles through the Management API.
 - **Microservices split.** When a split happens, new services go in `apps/<name>/`, and each owns its own database. NGINX gets one new `location /api/v1/<resource>/` block per service. Clients don't change.
 - **RabbitMQ.** Deferred until there is a second service or a background-work need. When added, use `RabbitMQ.Client` directly, wrapped in a small shared messaging library in `libs/`.
