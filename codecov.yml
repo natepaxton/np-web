@@ -25,6 +25,10 @@ comment:
 # One component per project. Add an entry when a new project gets tests.
 component_management:
   individual_components:
+    - component_id: api
+      name: api
+      paths:
+        - apps/api/src/**
     - component_id: sandbox
       name: sandbox
       paths:
@@ -34,7 +38,7 @@ component_management:
       paths:
         - libs/ui/**
 
-# Mirrors the exclusions in the Jest configs.
+# Mirrors the exclusions in the Jest configs and the .NET coverage settings.
 ignore:
   - 'libs/helm/**'
   - '**/*.spec.ts'
@@ -44,3 +48,7 @@ ignore:
   - '**/*.routes.ts'
   - '**/*.g.ts'
   - '**/index.ts'
+  - 'aspire/**'
+  - 'apps/api/tests/**'
+  - '**/Migrations/**'
+  - '**/*.g.cs'
