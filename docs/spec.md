@@ -291,7 +291,11 @@ What gets configured:
 **.NET setup**
 
 - `global.json` pins SDK `10.0.401` (`rollForward: latestFeature`) and selects the **Microsoft Testing Platform** runner for `dotnet test`.
-- `dotnet-tools.json` pins local tools: the Aspire CLI (`dotnet aspire …`) and ReportGenerator. Run `dotnet tool restore` after cloning.
+- `dotnet-tools.json` pins ReportGenerator as a local tool. Run `dotnet tool restore` after cloning.
+- The **Aspire CLI** is _not_ in the tool manifest. On Linux, `dotnet tool restore` fails when the manifest contains `aspire.cli`, which ships platform-specific packages: it reports the other tool as containing only `aspire`. This was reproduced in the `mcr.microsoft.com/dotnet/sdk:10.0` image.
+  - `dotnet run --project aspire/AppHost` works without the CLI, because the AppHost SDK bundles it (`AspireUseCliBundle`).
+  - For `aspire run`, `describe`, and `publish`, install it machine-wide with `curl -sSL https://aspire.dev/install.sh | bash`.
+  - Milestone 4, which runs `aspire publish` in CI, will install it the same way.
 - `Directory.Build.props` applies to every project: nullable reference types, implicit usings, warnings as errors, and code style enforced in the build.
 - `Directory.Packages.props` holds every NuGet version (central package management).
 - Tests use **xUnit v3** on Microsoft Testing Platform, and `Microsoft.AspNetCore.Mvc.Testing` for in-memory integration tests.
@@ -422,7 +426,7 @@ np-aspire.slnx              .NET solution
 Directory.Build.props       Shared MSBuild settings
 Directory.Packages.props    Central NuGet package management
 global.json                 Pins the .NET SDK and selects the Microsoft Testing Platform test runner
-dotnet-tools.json           Local .NET tools (Aspire CLI, ReportGenerator)
+dotnet-tools.json           Local .NET tools (ReportGenerator)
 .tool-versions              Node version (asdf, CI)
 .gitattributes              LF line endings
 components.json             spartan/ui CLI config (style: mira)

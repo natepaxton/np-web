@@ -38,9 +38,10 @@ Full spec, architecture, and open decisions: @docs/spec.md
 - New Angular lib: `npx nx g @nx/angular:library libs/<name> --importPath=@np-aspire/<name>` (defaults for scss/jest/eslint live in `nx.json`), then add a `type:*` tag
 - New component: `npx nx g @nx/angular:component <path>/<name>/<name>`
 - New helm primitive: `npx nx g @spartan-ng/cli:ui <name>`, then rename its project to `helm-<name>`, tag it `type:helm`, and run `npx nx lint helm-<name> --fix`
-- .NET tools (after cloning): `dotnet tool restore` (Aspire CLI, ReportGenerator — pinned in `dotnet-tools.json`)
-- Run everything (dev): `dotnet run --project aspire/AppHost` (or `dotnet aspire run`); inspect with `dotnet aspire describe`
-- Generate compose: `dotnet aspire publish -o deploy/compose`
+- .NET tools (after cloning): `dotnet tool restore` (ReportGenerator, pinned in `dotnet-tools.json`)
+- Aspire CLI (optional, machine-wide — not in the tool manifest, see spec §3.6): `curl -sSL https://aspire.dev/install.sh | bash`
+- Run everything (dev): `dotnet run --project aspire/AppHost` (the AppHost SDK bundles what it needs; with the Aspire CLI: `aspire run`, inspect with `aspire describe`)
+- Generate compose: `aspire publish -o deploy/compose`
 - Full stack in containers: `docker compose -f deploy/compose/docker-compose.yaml up`
 - .NET build/test via Nx: `npx nx build NpAspire.Api` / `npx nx test NpAspire.Api.Tests` (add `--configuration=ci` for coverage + minimums); plain `dotnet build np-aspire.slnx` / `dotnet test --solution np-aspire.slnx` also work
 - .NET formatting: `dotnet format np-aspire.slnx` (CI runs `--verify-no-changes`)
