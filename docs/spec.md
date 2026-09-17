@@ -86,7 +86,8 @@ The API validates tokens and enforces all access rules (see np-aspire-api's spec
 - **Login flow:** Authorization Code + PKCE through the Auth0 Angular SDK (`@auth0/auth0-angular`). Apps wire it up with `provideNpAuth()` from `@np-aspire/auth`, which holds the tenant settings in one place.
 - **Tenant:** `nate-paxton.auth0.com`, SPA client `bMCqpBAFVb0NWPuHZp74Suxz9ggsADST`. Both values are public in a browser app, so they are plain constants in the `auth` library rather than build-time configuration; a second tenant would change that.
 - **Audience:** the SPA requests tokens for the Auth0 **API** audience, `https://api.np-aspire.com`, so they are JWT access tokens. It is an Auth0 identifier, not an address the app calls — backend requests stay relative (§2).
-- **Token storage:** tokens are kept in memory (the SDK default), with **refresh token rotation** (`useRefreshTokens`). Never `localStorage`. The API is created with `allow_offline_access`, and the SPA client with rotating refresh tokens, so this works without a silent-auth fallback.
+- **Token storage:** tokens are kept in memory (the SDK default), with **refresh token rotation** (`useRefreshTokens`). Never `localStorage`. The API is created with `allow_offline_access` and the SPA client with rotating refresh tokens.
+- **Cold starts need `useRefreshTokensFallback`.** The memory cache means the refresh token lives in a web worker that dies with the page, so after a reload the SDK has nothing to refresh with and throws `Missing Refresh Token`. The fallback lets it get a fresh pair from the hidden iframe (`prompt=none`) using the Auth0 session cookie. That path depends on third-party cookies, so an **Auth0 custom domain** will be needed before it is dependable outside dev (§6).
 - **Interceptor:** the Auth0 HTTP interceptor's `allowedList` covers only `/api/*`, so tokens are never sent anywhere else. `provideNpAuth()` declares the list; each app registers `authHttpInterceptorFn` with its own `provideHttpClient`.
 - **Route guards** (`authGuard`) are for user experience only. They are not security.
 - **Angular never decides access and never decodes access tokens.** It shows or hides UI based on the `permissions` returned by `GET /api/v1/users/me`.
@@ -214,6 +215,7 @@ This follows Nx conventions: deployable projects go in `apps/`, and shared libra
 
 - **API client generation:** the generator (for example `ng-openapi-gen` or `@hey-api/openapi-ts`), and where the OpenAPI document comes from: a copy committed and checked in CI, a release artifact from np-aspire-api, or a running API.
 - **Production hosting and packaging:** how the built apps are served (static hosting, a container image, or behind a future gateway) and whether that is same-origin with the API. It is decided together with np-aspire-api's deployment target.
+- **An Auth0 custom domain:** the silent-iframe fallback that covers cold starts relies on third-party cookies, which browsers increasingly block (Safari already does, and the e2e suite runs WebKit). A custom domain makes the Auth0 origin first-party. It would be Terraform in np-aspire-api.
 - **An API for the E2E job:** the login tests need a running backend, and CI has none, so they skip there. Options are starting np-aspire-api's container in the workflow, pointing at a deployed dev environment, or leaving those tests local-only. It depends on the deployment target above.
 
 ## 7. Milestones
@@ -245,7 +247,9 @@ This follows Nx conventions: deployable projects go in `apps/`, and shared libra
 - The Auth0 application's callback, logout, and web-origin URLs are `http://localhost:4300`. Anything served from another origin fails the callback, so the sandbox's port 4300 is now load-bearing.
 - No Auth0-side work was needed: np-aspire-api's Terraform already provisioned the API (with `allow_offline_access` and RBAC), the roles, and the test users. `terraform -chdir=infra/auth0 plan -var-file=env/dev.tfvars` reported no changes on 2026-09-17.
 - The `/api/*` interceptor is wired: `provideNpAuth()` sets the `allowedList`, `sandbox` registers `authHttpInterceptorFn` with `provideHttpClient`, and `apps/sandbox/proxy.conf.json` forwards `/api` to `http://localhost:5104` in dev. The Home page's "API auth check" panel calls `GET /api/v1/auth/check` to exercise it end to end.
-- `apps/sandbox-e2e/src/auth.spec.ts` signs in as each test user through real Universal Login and asserts the check endpoint's answer: 200 for `test-member` and `test-admin`, 403 for `test-norole`. Chromium only, to keep it to three real logins per run. The tests skip when `E2E_TEST_USER_PASSWORD` is unset or the API is not answering, so they pass locally with the backend up and skip in CI until it has one (§6).
+- `apps/sandbox-e2e/src/auth.spec.ts` signs in as each test user through real Universal Login and calls `GET /api/v1/auth/check`. **All three get 200, including `test-norole`:** that endpoint is plain `[Authorize]`, so it asks for a valid token, not for a permission. Roles are not yet distinguishable from the frontend; the 403 case needs an endpoint behind a permission policy, which arrives with `UsersController`.
+- Those tests are Chromium only, to keep it to three real logins per run, and skip when `E2E_TEST_USER_PASSWORD` is unset or the API is not answering — so they pass locally with the backend up and skip in CI until it has one (§6).
+- The tenant serves the **Classic** Universal Login (the Lock widget), so the login helper uses role-based locators (`Email`, `Password`, `Log In`) that also fit the New experience if the tenant switches.
 - Still open (with the API client): permission helpers and route guards.
 
 ## 8. Deferred

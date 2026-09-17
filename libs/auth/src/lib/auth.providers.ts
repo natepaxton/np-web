@@ -20,8 +20,14 @@ const authConfig = {
  * Wires the Auth0 Angular SDK into an app: Authorization Code + PKCE against the tenant above,
  * asking for tokens for the np-aspire API so they come back as JWT access tokens the API can
  * validate. Tokens stay in memory (the SDK default) rather than in `localStorage`, and refresh
- * token rotation keeps the session alive across reloads — the API allows offline access and the
- * SPA client is configured for rotating refresh tokens.
+ * token rotation renews them — the API allows offline access and the SPA client is configured for
+ * rotating refresh tokens.
+ *
+ * `useRefreshTokensFallback` matters because of that memory cache: the refresh token lives in a
+ * web worker that dies with the page, so after a reload there is nothing to refresh with and the
+ * SDK would throw `Missing Refresh Token`. The fallback lets it get a fresh pair from the hidden
+ * iframe (`prompt=none`) using the Auth0 session cookie. That path needs third-party cookies, so
+ * it will want an Auth0 custom domain before it can be relied on outside of dev.
  *
  * The SDK's HTTP interceptor attaches those access tokens, but only to the `/api/*` URLs in
  * `allowedList`, so a token can never leak to a third-party host. Apps still have to register
@@ -39,6 +45,7 @@ export function provideNpAuth(): EnvironmentProviders {
       audience: authConfig.audience,
     },
     useRefreshTokens: true,
+    useRefreshTokensFallback: true,
     httpInterceptor: {
       // Backend calls are relative (`/api/v1/...`), so one wildcard covers the whole API.
       allowedList: [{ uri: '/api/*' }],

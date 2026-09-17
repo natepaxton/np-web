@@ -26,9 +26,7 @@
   description="Calls GET /api/v1/auth/check. The interceptor attaches the access token; the API decides the outcome."
 >
   @if (checkResult(); as result) {
-  <p class="text-xs" [class.text-destructive]="!result.ok" data-testid="api-check-result">
-    {{ result.status }} — {{ result.detail }}
-  </p>
+  <p class="text-xs" [class.text-destructive]="!result.ok" data-testid="api-check-result">{{ result.message }}</p>
   } @else {
   <p class="text-xs text-muted-foreground">Not called yet.</p>
   }

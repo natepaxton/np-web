@@ -14,24 +14,30 @@ export const testUsers = {
 /** Shared password for all three, from the GitHub secret or a local .env.local. */
 export const testUserPassword = process.env['E2E_TEST_USER_PASSWORD'] ?? '';
 
+/** Matches the submit button in both Universal Login experiences. */
+const submitButton = /^(log ?in|continue)$/i;
+
 /**
  * Signs in through Auth0 Universal Login and waits for the app to finish the callback.
- * Handles both the single-page form and the identifier-first variant.
+ *
+ * The tenant currently serves the Classic experience (the Lock widget), which labels its fields
+ * "Email" and "Password". Role-based locators also cover the New experience, where the field is
+ * "Email address", the button is "Continue", and the password may come on a second step.
  */
 export async function logIn(page: Page, email: string): Promise<void> {
   await page.goto('/');
   await page.getByRole('button', { name: 'Log in' }).click();
   await page.waitForURL(/auth0\.com/);
 
-  await page.locator('input[name="username"]').fill(email);
+  await page.getByRole('textbox', { name: /email/i }).fill(email);
 
-  const password = page.locator('input[name="password"]');
+  const password = page.getByRole('textbox', { name: /password/i });
   if (!(await password.isVisible())) {
-    await page.locator('button[type="submit"]').click();
+    await page.getByRole('button', { name: submitButton }).click();
     await password.waitFor();
   }
   await password.fill(testUserPassword);
-  await page.locator('button[type="submit"]').click();
+  await page.getByRole('button', { name: submitButton }).click();
 
   await page.waitForURL((url) => !url.hostname.endsWith('auth0.com'));
   await expect(page.getByTestId('auth-user')).toHaveText(email);

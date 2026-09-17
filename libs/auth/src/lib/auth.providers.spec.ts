@@ -14,6 +14,7 @@ describe('provideNpAuth', () => {
         audience: 'https://api.np-aspire.com',
       },
       useRefreshTokens: true,
+      useRefreshTokensFallback: true,
       httpInterceptor: { allowedList: [{ uri: '/api/*' }] },
     });
   });

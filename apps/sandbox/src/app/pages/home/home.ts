@@ -4,11 +4,10 @@ import { Panel } from '@np-aspire/ui';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmInput } from '@spartan-ng/helm/input';
 
-/** What the last `/api/v1/auth/check` call returned. */
+/** How the last `/api/v1/auth/check` call went, ready to display. */
 interface CheckResult {
   ok: boolean;
-  status: number;
-  detail: string;
+  message: string;
 }
 
 @Component({
@@ -42,12 +41,24 @@ export class Home {
     this.http.get('/api/v1/auth/check', { observe: 'response', responseType: 'text' }).subscribe({
       next: (response) => {
         this.checking.set(false);
-        this.checkResult.set({ ok: true, status: response.status, detail: response.body ?? '' });
+        this.checkResult.set({ ok: true, message: `${response.status} — ${response.body ?? ''}` });
       },
-      error: (error: HttpErrorResponse) => {
+      error: (error: unknown) => {
         this.checking.set(false);
-        this.checkResult.set({ ok: false, status: error.status, detail: error.statusText || error.message });
+        this.checkResult.set({ ok: false, message: describeFailure(error) });
       },
     });
   }
+}
+
+/**
+ * The call can fail before it reaches the API: the interceptor asks the SDK for an access token
+ * first, and that throws when there is no session to renew from. Those failures have no HTTP
+ * status, so printing one would be misleading.
+ */
+function describeFailure(error: unknown): string {
+  if (error instanceof HttpErrorResponse) {
+    return `${error.status} — ${error.statusText || error.message}`;
+  }
+  return `No token — ${error instanceof Error ? error.message : String(error)}`;
 }

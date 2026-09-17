@@ -1,7 +1,16 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { throwError } from 'rxjs';
 import { Home } from './home';
+
+function buttons(fixture: ComponentFixture<Home>): HTMLButtonElement[] {
+  return Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+}
+
+function resultText(fixture: ComponentFixture<Home>): string | undefined {
+  return (fixture.nativeElement as HTMLElement).querySelector('[data-testid="api-check-result"]')?.textContent;
+}
 
 describe('Home', () => {
   let http: HttpTestingController;
@@ -17,11 +26,7 @@ describe('Home', () => {
     return fixture;
   }
 
-  afterEach(() => http?.verify());
-
-  function buttons(fixture: ComponentFixture<Home>): HTMLButtonElement[] {
-    return Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
-  }
+  afterEach(() => http.verify());
 
   it('greets the entered name', async () => {
     const fixture = await render();
@@ -51,10 +56,8 @@ describe('Home', () => {
       request.flush('authenticated', { status: 200, statusText: 'OK' });
       await fixture.whenStable();
 
-      const result = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="api-check-result"]');
-      expect(result?.textContent).toContain('200');
-      expect(result?.textContent).toContain('authenticated');
-      expect(result?.classList).not.toContain('text-destructive');
+      expect(resultText(fixture)).toContain('200');
+      expect(resultText(fixture)).toContain('authenticated');
     });
 
     it('reports the status when the API refuses the call', async () => {
@@ -64,10 +67,8 @@ describe('Home', () => {
       http.expectOne('/api/v1/auth/check').flush('', { status: 403, statusText: 'Forbidden' });
       await fixture.whenStable();
 
-      const result = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="api-check-result"]');
-      expect(result?.textContent).toContain('403');
-      expect(result?.textContent).toContain('Forbidden');
-      expect(result?.classList).toContain('text-destructive');
+      expect(resultText(fixture)).toContain('403');
+      expect(resultText(fixture)).toContain('Forbidden');
     });
 
     it('disables the button while the call is in flight', async () => {
@@ -82,5 +83,29 @@ describe('Home', () => {
       await fixture.whenStable();
       expect(buttons(fixture)[1].disabled).toBe(false);
     });
+  });
+});
+
+/**
+ * When the SDK cannot produce an access token, the Auth0 interceptor fails the request with a
+ * plain Error rather than an HttpErrorResponse, so there is no status to show.
+ */
+describe('Home without an access token', () => {
+  it('says no token instead of inventing a status', async () => {
+    const tokenError = new Error("Missing Refresh Token (audience: 'https://api.np-aspire.com')");
+    await TestBed.configureTestingModule({
+      imports: [Home],
+      providers: [provideHttpClient(withInterceptors([() => throwError(() => tokenError)]))],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(Home);
+    await fixture.whenStable();
+    buttons(fixture)[1].click();
+    await fixture.whenStable();
+
+    expect(resultText(fixture)).toBe("No token — Missing Refresh Token (audience: 'https://api.np-aspire.com')");
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[data-testid="api-check-result"]')?.classList,
+    ).toContain('text-destructive');
   });
 });
