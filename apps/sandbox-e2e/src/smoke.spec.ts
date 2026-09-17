@@ -7,6 +7,7 @@ test.describe('sandbox smoke', () => {
     await expect(page.getByTestId('app-name')).toContainText('sandbox');
     await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Home' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'UI check' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'API auth check' })).toBeVisible();
   });
 
   test('applies the Spartan theme', async ({ page }) => {
@@ -23,5 +24,14 @@ test.describe('sandbox smoke', () => {
     await page.getByLabel('Name').fill('Ada');
     await page.getByRole('button', { name: 'Greet' }).click();
     await expect(page.getByTestId('greeting')).toHaveText('Hello, Ada!');
+  });
+
+  test('navigates to the profile page', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Profile' }).click();
+
+    await expect(page).toHaveURL(/\/profile$/);
+    await expect(page.getByRole('heading', { name: 'User profile' })).toBeVisible();
   });
 });

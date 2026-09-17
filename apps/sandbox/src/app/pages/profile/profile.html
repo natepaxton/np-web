@@ -1,0 +1,17 @@
+<h1 class="mb-4 text-lg font-semibold">Profile</h1>
+
+<ui-panel
+  class="max-w-md"
+  title="User profile"
+  description="The ID token claims Auth0 returned for the signed-in user. Permissions come from the API, not from here."
+>
+  @if (isLoading()) {
+  <p class="text-xs text-muted-foreground" data-testid="profile-loading">Checking session…</p>
+  } @else if (error(); as error) {
+  <p class="text-xs text-destructive" data-testid="profile-error">{{ error.message }}</p>
+  } @else if (user(); as user) {
+  <pre class="overflow-x-auto text-xs" data-testid="profile-user">{{ user | json }}</pre>
+  } @else {
+  <p class="text-xs" data-testid="profile-signed-out">Not signed in. Use Log in to start a session.</p>
+  }
+</ui-panel>

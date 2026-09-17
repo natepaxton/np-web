@@ -1,15 +1,19 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 import { nxE2EPreset } from '@nx/playwright/preset';
 import { workspaceRoot } from '@nx/devkit';
 
+// The login tests need E2E_TEST_USER_PASSWORD (the dev-tenant test users' password, the same
+// value as np-aspire-api's TF_VAR_test_user_password). Locally it comes from a gitignored
+// .env.local; in CI from the GitHub secret. Tests that need it skip when it is missing.
+const envFile = join(workspaceRoot, '.env.local');
+if (existsSync(envFile)) {
+  process.loadEnvFile(envFile);
+}
+
 // For CI, you may want to set BASE_URL to the deployed application.
 const baseURL = process.env['BASE_URL'] || 'http://localhost:4300';
-
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import 'dotenv/config';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
