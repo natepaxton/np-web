@@ -284,22 +284,39 @@ What gets configured:
 - The .NET solution (`np-aspire.slnx`) still works on its own in Rider, Visual Studio, and the `dotnet` CLI.
 - The plugin has no project generators. Create .NET projects with `dotnet new` in the Nx folders: deployable projects in `apps/`, shared class libraries in `libs/`.
 - Fallback: add `nx:run-commands` targets only for things the plugin can't infer, such as `aspire publish` or Docker image builds.
+- **Project names** are the `.csproj` names: `NpAspire.Api`, `NpAspire.Api.Tests`, `NpAspire.AppHost`, and `NpAspire.ServiceDefaults`. Renaming them in `project.json` would break the dependency edges the plugin creates.
+- **Test projects** must set `<IsTestProject>true</IsTestProject>`, otherwise the plugin creates no `test` target. xUnit v3 on Microsoft Testing Platform doesn't set it.
+- **Per-project target settings** live in a `project.json` next to the `.csproj`, which Nx merges with the inferred targets. `NpAspire.Api.Tests/project.json` adds the `test:ci` configuration that collects coverage.
+
+**.NET setup**
+
+- `global.json` pins SDK `10.0.401` (`rollForward: latestFeature`) and selects the **Microsoft Testing Platform** runner for `dotnet test`.
+- `dotnet-tools.json` pins local tools: the Aspire CLI (`dotnet aspire …`) and ReportGenerator. Run `dotnet tool restore` after cloning.
+- `Directory.Build.props` applies to every project: nullable reference types, implicit usings, warnings as errors, and code style enforced in the build.
+- `Directory.Packages.props` holds every NuGet version (central package management).
+- Tests use **xUnit v3** on Microsoft Testing Platform, and `Microsoft.AspNetCore.Mvc.Testing` for in-memory integration tests.
+- ServiceDefaults maps `/health` and `/alive` in Development only. Tests verify that they, and the OpenAPI document, return 404 in Production.
+- Line endings are LF everywhere (`.gitattributes`, `.editorconfig`). `dotnet format --verify-no-changes` runs in CI.
 
 ### 3.7 CI
 
 **GitHub Actions** (`.github/workflows/ci.yml`) runs on PRs into `main` and on pushes to `main`. A newer push cancels an in-progress run for the same branch.
 
 - **`Lint, test, build` job:**
-  1. `nx format:check`
+  1. `nx format:check` and `dotnet format --verify-no-changes`
   2. `nx affected -t lint build`
   3. `nx run-many -t test --configuration=ci`. All projects are tested so Codecov always gets a complete report. Revisit (affected tests plus Codecov carryforward flags) if test time grows.
   4. Coverage table written to the job summary (`tools/scripts/coverage-summary.mjs`).
   5. Upload to Codecov, and upload coverage reports as an artifact.
 - **`E2E` job:** `nx affected -t e2e`, with Playwright browsers cached by version. The Playwright report is uploaded on failure.
 - The Node version comes from `.tool-versions`, which asdf also uses locally.
+- Shared job setup lives in `.github/actions/setup`:
+  - Node and `npm ci`
+  - .NET from `global.json`, with a NuGet cache and `dotnet tool restore`
+  - `nx-set-shas`
+  - Both jobs need .NET, because `@nx/dotnet` builds part of the project graph.
 - Nx Cloud is not used (`NX_NO_CLOUD=true`).
 - **Later additions:**
-  - .NET build, test, and coverage (milestone 2)
   - `generate-permissions` drift check and `tf-fmt`/`tf-validate` (milestone 3)
   - Docker image build and an `aspire publish` check (milestone 4)
   - `tf-plan` PR comment
@@ -319,12 +336,17 @@ The test tools enforce the minimums, so CI and local runs fail the same way. Cod
   - Jest (Istanbul) with `coverageThreshold` in each project's `jest.config.cts`.
   - `collectCoverageFrom` lists all source files, so a file with no tests counts as uncovered.
   - Reporters: `lcov` (for Codecov), `json-summary`, and `text-summary`.
-- **.NET:** Coverlet with a threshold, plus ReportGenerator (milestone 2).
+- **.NET:**
+  - `coverlet.MTP` collects coverage (`dotnet test --coverlet`). Its settings are in each test project's `testconfig.json`.
+  - ReportGenerator merges the results into `coverage/<project path>/Cobertura.xml` (uploaded to Codecov) and `Summary.json`.
+  - Neither tool can enforce a minimum on Microsoft Testing Platform, so `tools/scripts/dotnet-test-coverage.mjs` runs all three steps and fails below the minimums (lines, branches, methods).
+  - It runs as the `test:ci` configuration: `npx nx test NpAspire.Api.Tests --configuration=ci`.
 - **Excluded from coverage:**
   - `libs/helm/**`
   - `main.ts`, `app.config.ts`, `*.routes.ts`, `index.ts` barrels
   - generated `*.g.ts` / `*.g.cs`
-  - EF migrations, `Program.cs`, and the Aspire projects
+  - EF migrations and the Aspire projects
+  - `Program.cs` is **not** excluded: the in-memory integration tests run it, so its setup is covered.
 - **Codecov (`codecov.yml`):**
   - `project` status: overall coverage may not drop by more than 1%.
   - `patch` status: changed lines must reach 80%.
@@ -349,7 +371,12 @@ The test tools enforce the minimums, so CI and local runs fail the same way. Cod
 - **Version updates** (`.github/dependabot.yml`):
   - Checked every Monday at 06:00 America/New_York, with at most 5 open PRs per ecosystem.
   - New releases wait 3 days before being proposed (7 days for major releases).
-  - Ecosystems: `npm` and `github-actions` now; add `nuget` in milestone 2 and `terraform` in milestone 3.
+  - Ecosystems:
+    - `npm`
+    - `github-actions`
+    - `nuget`: `Directory.Packages.props`, the AppHost SDK version, and `dotnet-tools.json`. Grouped as `aspire`, `aspnetcore-and-extensions`, `opentelemetry`, `testing`, and `minor-and-patch`.
+    - `dotnet-sdk`: `global.json`, excluding major versions.
+    - Add `terraform` in milestone 3.
 - **npm groups:** `nx`, `angular`, `ui-styling` (Spartan, Tailwind, PostCSS), and `minor-and-patch` for everything else. Other majors arrive as individual PRs.
 - **Majors Dependabot ignores**, because they are upgraded with tooling that also migrates code:
   - Nx and Angular (`npx nx migrate latest`)
@@ -373,8 +400,8 @@ libs/
   helm/                     spartan/ui helm components (generated, owned by us)
   auth/                     Angular Auth0 setup and generated permission types (milestone 5)
 aspire/
-  AppHost/                  Aspire AppHost
-  ServiceDefaults/          Shared Aspire service defaults
+  AppHost/                  Aspire AppHost (NpAspire.AppHost)
+  ServiceDefaults/          Shared Aspire service defaults (NpAspire.ServiceDefaults)
 infra/
   nginx/nginx.conf
   auth0/                    Nx project `auth0-config`
@@ -383,15 +410,21 @@ infra/
     actions/                Post-Login Action source (JavaScript)
     env/dev.tfvars          Non-secret per-environment values
 tools/
-  scripts/                  Codegen scripts (for example generate-permissions)
+  scripts/                  CI and codegen scripts (coverage summary, .NET coverage, generate-permissions)
 deploy/
   compose/                  Generated by `aspire publish`. Do not edit.
 docs/
-.github/workflows/          GitHub Actions
+.github/
+  workflows/ci.yml          CI
+  actions/setup/            Shared CI setup (Node, .NET, dependencies)
+  dependabot.yml            Dependency updates
 np-aspire.slnx              .NET solution
 Directory.Build.props       Shared MSBuild settings
 Directory.Packages.props    Central NuGet package management
-global.json                 Pins the .NET SDK
+global.json                 Pins the .NET SDK and selects the Microsoft Testing Platform test runner
+dotnet-tools.json           Local .NET tools (Aspire CLI, ReportGenerator)
+.tool-versions              Node version (asdf, CI)
+.gitattributes              LF line endings
 components.json             spartan/ui CLI config (style: mira)
 nx.json / package.json
 ```
@@ -401,11 +434,25 @@ This follows Nx conventions: deployable projects (Angular or .NET) go in `apps/`
 ## 5. Milestones
 
 1. **Frontend workspace scaffold** (detailed below)
-2. Add the .NET solution, the Aspire AppHost, ServiceDefaults, and `@nx/dotnet`.
+2. ✅ Add the .NET solution, the Aspire AppHost, ServiceDefaults, and `@nx/dotnet` (done 2026-09-17).
 3. Add the permissions manifest, the `generate-permissions` target, and Terraform for the dev Auth0 tenant (API, roles, SPA client, Post-Login Action, test users). Then build the API: PostgreSQL, EF Core, Dapper, API versioning, a health endpoint, Auth0 JWT validation with deny-by-default and permission policies, the `Users` table, and `UsersController` (`/me` and the admin `/{id}`), all wired into Aspire.
 4. Add the NGINX gateway as an Aspire resource, a Dockerfile for the API, and the Aspire Docker Compose publisher, so `docker compose up` runs the full stack.
 5. Add Auth0 login to the sandbox, the Angular dev proxy to NGINX, a `/users/me` page, an admin-only user lookup page (hidden when the user lacks `read:users`), and Playwright tests that log in as `test-member`, `test-admin`, and `test-norole` to verify the guards, the hidden UI, and the API's 403 responses.
 6. ✅ Base GitHub Actions CI with coverage and Codecov (done early, 2026-09-17). Each later milestone extends it: the `generate-permissions` drift check, `tf-fmt`/`tf-validate`, .NET coverage, and eventually a `tf-plan` PR comment.
+
+### Milestone 2 — .NET solution and Aspire ✅ (done 2026-09-17)
+
+- **Solution:** `np-aspire.slnx`, containing:
+  - `NpAspire.Api`: controllers-based API skeleton with ServiceDefaults and OpenAPI; no HTTPS redirection
+  - `NpAspire.Api.Tests`: xUnit v3 on Microsoft Testing Platform
+  - `NpAspire.AppHost`: Aspire 13.5.4; runs `api` with an HTTP health check
+  - `NpAspire.ServiceDefaults`
+- **Local run:** `dotnet run --project aspire/AppHost` starts the dashboard, and `api` reports Running/Healthy.
+- **Coverage:** 100% lines, branches, and methods, via `coverlet.MTP`, ReportGenerator, and `tools/scripts/dotnet-test-coverage.mjs`. The threshold failure was checked before the Production-environment test was added.
+- **Deviations from the original plan:**
+  - Coverlet's MSBuild threshold was dropped. .NET 10.0.4xx and xUnit v3 4.x default to Microsoft Testing Platform, where Coverlet can't enforce minimums.
+  - `Program.cs` is included in coverage.
+- **CI:** gets .NET through the shared setup action. Dependabot gets `nuget` and `dotnet-sdk`. Codecov gets an `api` component.
 
 ### Milestone 1 — Frontend workspace scaffold ✅ (done 2026-09-16)
 

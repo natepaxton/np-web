@@ -57,7 +57,8 @@
       "options": {
         "targetName": "lint"
       }
-    }
+    },
+    "@nx/dotnet"
   ],
   "generators": {
     "@nx/angular:application": {
@@ -74,5 +75,15 @@
     "@nx/angular:component": {
       "style": "scss"
     }
+  },
+  "analytics": false,
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/*.Tests/**/*",
+      "!{projectRoot}/**/bin/**/*",
+      "!{projectRoot}/**/obj/**/*"
+    ]
   }
 }
