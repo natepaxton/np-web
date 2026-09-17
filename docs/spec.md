@@ -287,10 +287,52 @@ What gets configured:
 
 ### 3.7 CI
 
-- **GitHub Actions.**
-- On pull requests: `nx affected -t lint test build`, with the .NET and Node toolchains set up and Nx caching enabled.
-- Playwright e2e runs on PRs whose changes affect the apps.
-- Later: build and push Docker images, and validate that `aspire publish` still succeeds.
+**GitHub Actions** (`.github/workflows/ci.yml`) runs on PRs into `main` and on pushes to `main`. A newer push cancels an in-progress run for the same branch.
+
+- **`Lint, test, build` job:**
+  1. `nx format:check`
+  2. `nx affected -t lint build`
+  3. `nx run-many -t test --configuration=ci`. All projects are tested so Codecov always gets a complete report. Revisit (affected tests plus Codecov carryforward flags) if test time grows.
+  4. Coverage table written to the job summary (`tools/scripts/coverage-summary.mjs`).
+  5. Upload to Codecov, and upload coverage reports as an artifact.
+- **`E2E` job:** `nx affected -t e2e`, with Playwright browsers cached by version. The Playwright report is uploaded on failure.
+- The Node version comes from `.tool-versions`, which asdf also uses locally.
+- Nx Cloud is not used (`NX_NO_CLOUD=true`).
+- **Later additions:**
+  - .NET build, test, and coverage (milestone 2)
+  - `generate-permissions` drift check and `tf-fmt`/`tf-validate` (milestone 3)
+  - Docker image build and an `aspire publish` check (milestone 4)
+  - `tf-plan` PR comment
+
+**Code coverage**
+
+The test tools enforce the minimums, so CI and local runs fail the same way. Codecov adds reporting.
+
+| Scope                                          | Lines / statements / functions | Branches |
+| ---------------------------------------------- | ------------------------------ | -------- |
+| Shared libraries (`ui`, …)                     | 80%                            | 75%      |
+| .NET API                                       | 80%                            | 75%      |
+| `sandbox` (developer tool)                     | 60%                            | 50%      |
+| Changed lines in a PR (Codecov `patch` status) | 80%                            | —        |
+
+- **Angular:**
+  - Jest (Istanbul) with `coverageThreshold` in each project's `jest.config.cts`.
+  - `collectCoverageFrom` lists all source files, so a file with no tests counts as uncovered.
+  - Reporters: `lcov` (for Codecov), `json-summary`, and `text-summary`.
+- **.NET:** Coverlet with a threshold, plus ReportGenerator (milestone 2).
+- **Excluded from coverage:**
+  - `libs/helm/**`
+  - `main.ts`, `app.config.ts`, `*.routes.ts`, `index.ts` barrels
+  - generated `*.g.ts` / `*.g.cs`
+  - EF migrations, `Program.cs`, and the Aspire projects
+- **Codecov (`codecov.yml`):**
+  - `project` status: overall coverage may not drop by more than 1%.
+  - `patch` status: changed lines must reach 80%.
+  - One component per project.
+  - Uploads use the `CODECOV_TOKEN` repository secret.
+  - **Every new project with tests needs** a `collectCoverageFrom` and threshold in its Jest config, and a Codecov component.
+
+**Branch protection:** planned, with required checks `Lint, test, build`, `E2E`, `codecov/patch`, and `codecov/project`. It needs GitHub Pro or a public repository (see §6).
 
 ## 4. Repository layout
 
@@ -338,7 +380,7 @@ This follows Nx conventions: deployable projects (Angular or .NET) go in `apps/`
 3. Add the permissions manifest, the `generate-permissions` target, and Terraform for the dev Auth0 tenant (API, roles, SPA client, Post-Login Action, test users). Then build the API: PostgreSQL, EF Core, Dapper, API versioning, a health endpoint, Auth0 JWT validation with deny-by-default and permission policies, the `Users` table, and `UsersController` (`/me` and the admin `/{id}`), all wired into Aspire.
 4. Add the NGINX gateway as an Aspire resource, a Dockerfile for the API, and the Aspire Docker Compose publisher, so `docker compose up` runs the full stack.
 5. Add Auth0 login to the sandbox, the Angular dev proxy to NGINX, a `/users/me` page, an admin-only user lookup page (hidden when the user lacks `read:users`), and Playwright tests that log in as `test-member`, `test-admin`, and `test-norole` to verify the guards, the hidden UI, and the API's 403 responses.
-6. Set up the GitHub Actions CI pipeline. It includes the `generate-permissions` drift check and `tf-fmt`/`tf-validate`, and later a `tf-plan` comment on PRs.
+6. ✅ Base GitHub Actions CI with coverage and Codecov (done early, 2026-09-17). Each later milestone extends it: the `generate-permissions` drift check, `tf-fmt`/`tf-validate`, .NET coverage, and eventually a `tf-plan` PR comment.
 
 ### Milestone 1 — Frontend workspace scaffold ✅ (done 2026-09-16)
 
@@ -393,6 +435,8 @@ Implementation notes:
 
 ## 6. Open decisions
 
+- Branch protection: upgrade to GitHub Pro or make the repository public. The GitHub Free plan does not allow branch protection or rulesets on private repositories.
+- Dependabot configuration
 - Remote Terraform state backend (needed before CI runs `tf-apply`)
 
 ## 7. Deferred
