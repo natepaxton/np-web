@@ -4,6 +4,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { throwError } from 'rxjs';
 import { Home } from './home';
 
+/** The sandbox's API base is empty, so calls stay relative. */
+const checkUrl = '/api/v1/auth/check';
+
 function buttons(fixture: ComponentFixture<Home>): HTMLButtonElement[] {
   return Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
 }
@@ -51,7 +54,7 @@ describe('Home', () => {
       const fixture = await render();
       buttons(fixture)[1].click();
 
-      const request = http.expectOne('/api/v1/auth/check');
+      const request = http.expectOne(checkUrl);
       expect(request.request.method).toBe('GET');
       request.flush('authenticated', { status: 200, statusText: 'OK' });
       await fixture.whenStable();
@@ -64,11 +67,34 @@ describe('Home', () => {
       const fixture = await render();
       buttons(fixture)[1].click();
 
-      http.expectOne('/api/v1/auth/check').flush('', { status: 403, statusText: 'Forbidden' });
+      http.expectOne(checkUrl).flush('', { status: 403, statusText: 'Forbidden' });
       await fixture.whenStable();
 
       expect(resultText(fixture)).toContain('403');
       expect(resultText(fixture)).toContain('Forbidden');
+    });
+
+    it('shows the status alone when the API answers with no body', async () => {
+      const fixture = await render();
+      buttons(fixture)[1].click();
+
+      // What GET /api/v1/auth/check actually returns: Ok() with no content.
+      http.expectOne(checkUrl).flush(null, { status: 200, statusText: 'OK' });
+      await fixture.whenStable();
+
+      expect(resultText(fixture)).toBe('200 — ');
+    });
+
+    it('says there was no response when the request never reached the API', async () => {
+      const fixture = await render();
+      buttons(fixture)[1].click();
+
+      // Status 0: the dev proxy's upstream is down, or the browser blocked the call.
+      http.expectOne(checkUrl).error(new ProgressEvent('error'));
+      await fixture.whenStable();
+
+      expect(resultText(fixture)).toContain('No response —');
+      expect(resultText(fixture)).not.toContain('0 —');
     });
 
     it('disables the button while the call is in flight', async () => {
@@ -79,7 +105,7 @@ describe('Home', () => {
       expect(buttons(fixture)[1].disabled).toBe(true);
       expect(buttons(fixture)[1].textContent?.trim()).toBe('Calling…');
 
-      http.expectOne('/api/v1/auth/check').flush('ok');
+      http.expectOne(checkUrl).flush('ok');
       await fixture.whenStable();
       expect(buttons(fixture)[1].disabled).toBe(false);
     });
@@ -107,5 +133,19 @@ describe('Home without an access token', () => {
     expect(
       (fixture.nativeElement as HTMLElement).querySelector('[data-testid="api-check-result"]')?.classList,
     ).toContain('text-destructive');
+  });
+
+  it('describes a rejection that is not an Error at all', async () => {
+    await TestBed.configureTestingModule({
+      imports: [Home],
+      providers: [provideHttpClient(withInterceptors([() => throwError(() => 'no token for you')]))],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(Home);
+    await fixture.whenStable();
+    buttons(fixture)[1].click();
+    await fixture.whenStable();
+
+    expect(resultText(fixture)).toBe('No token — no token for you');
   });
 });

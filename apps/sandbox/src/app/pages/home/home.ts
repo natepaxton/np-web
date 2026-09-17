@@ -54,13 +54,16 @@ export class Home {
 }
 
 /**
- * The call can fail before it reaches the API: the interceptor asks the SDK for an access token
- * first, and that throws when there is no session to renew from. Those failures have no HTTP
- * status, so printing one would be misleading.
+ * Describes a failed call without inventing a status for it.
+ *
+ * Three ways this goes wrong, and they look nothing alike: the API answers with a status (403 for
+ * a user without the permission), the request never reaches it (status 0 — the dev proxy's
+ * upstream is down, or the browser blocked it), or the Auth0 interceptor fails first because it
+ * could not get an access token, which is not an `HttpErrorResponse` at all.
  */
 function describeFailure(error: unknown): string {
   if (error instanceof HttpErrorResponse) {
-    return `${error.status} — ${error.statusText || error.message}`;
+    return error.status === 0 ? `No response — ${error.message}` : `${error.status} — ${error.statusText}`;
   }
   return `No token — ${error instanceof Error ? error.message : String(error)}`;
 }
