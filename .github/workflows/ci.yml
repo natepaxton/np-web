@@ -16,14 +16,12 @@ concurrency:
 
 env:
   NX_NO_CLOUD: true
-  DOTNET_NOLOGO: true
-  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
   checks:
     name: Lint, test, build
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
         with:
@@ -32,9 +30,7 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Format
-        run: |
-          npx nx format:check --base="$NX_BASE" --head="$NX_HEAD"
-          dotnet format np-aspire.slnx --verify-no-changes
+        run: npx nx format:check --base="$NX_BASE" --head="$NX_HEAD"
 
       - name: Lint and build (affected)
         run: npx nx affected -t lint build

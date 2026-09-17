@@ -15,9 +15,3 @@ trim_trailing_whitespace = false
 
 [libs/helm/**]
 indent_style = tab
-
-[*.{cs,csproj,props,targets}]
-indent_size = 4
-
-[*.tf]
-indent_size = 2
