@@ -1,0 +1,46 @@
+# Codecov reports coverage on PRs. Minimum coverage is enforced by the test tools themselves
+# (Jest coverageThreshold, later Coverlet); Codecov adds PR comments and the patch (new code) check.
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  precision: 2
+  round: down
+  status:
+    project:
+      default:
+        # Overall coverage may not drop by more than 1% compared to the base commit.
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        # Lines added or changed in a PR must be at least 80% covered.
+        target: 80%
+
+comment:
+  layout: 'condensed_header, diff, components, condensed_files'
+  behavior: default
+  require_changes: false
+
+# One component per project. Add an entry when a new project gets tests.
+component_management:
+  individual_components:
+    - component_id: sandbox
+      name: sandbox
+      paths:
+        - apps/sandbox/**
+    - component_id: ui
+      name: ui
+      paths:
+        - libs/ui/**
+
+# Mirrors the exclusions in the Jest configs.
+ignore:
+  - 'libs/helm/**'
+  - '**/*.spec.ts'
+  - '**/test-setup.ts'
+  - '**/main.ts'
+  - '**/app.config.ts'
+  - '**/*.routes.ts'
+  - '**/*.g.ts'
+  - '**/index.ts'

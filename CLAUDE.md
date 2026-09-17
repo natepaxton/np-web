@@ -33,6 +33,7 @@ Full spec, architecture, and open decisions: @docs/spec.md
 - Affected only: `npx nx affected -t lint test build`
 - E2E: `npx nx e2e sandbox-e2e` (first time: `npx playwright install`)
 - Format: `npx nx format:write` / `npx nx format:check`
+- Test with coverage (as CI does): `npx nx run-many -t test --configuration=ci`
 - Project graph: `npx nx graph`
 - New Angular lib: `npx nx g @nx/angular:library libs/<name> --importPath=@np-aspire/<name>` (defaults for scss/jest/eslint live in `nx.json`), then add a `type:*` tag
 - New component: `npx nx g @nx/angular:component <path>/<name>/<name>`
@@ -69,4 +70,6 @@ Full spec, architecture, and open decisions: @docs/spec.md
 - NuGet versions go in `Directory.Packages.props` (central package management).
 - The AppHost is the source of truth for topology. Never hand-edit `deploy/compose/`; change the AppHost and re-publish.
 - Let `@nx/dotnet` infer .NET targets; only add `nx:run-commands` targets for things it can't infer.
+- Coverage minimums are enforced by the test tools: Jest `coverageThreshold` (libs 80/80/80/75, `sandbox` 60/60/60/50 for lines/statements/functions/branches), Coverlet for .NET. Never lower a threshold to make CI pass — add tests. New projects with tests need `collectCoverageFrom` + `coverageThreshold` in their Jest config and a component in `codecov.yml`.
+- CI lives in `.github/workflows/ci.yml`; keep job names stable (`Lint, test, build`, `E2E`) because branch protection will reference them.
 - When a TBD in `docs/spec.md` gets decided, update the spec.
