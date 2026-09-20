@@ -63,6 +63,20 @@
   }
 }
 
+.auth-error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+
+  p {
+    color: #fca5a5;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+}
+
 .login-button {
   background: #4ade80;
   color: #1a1a2e;

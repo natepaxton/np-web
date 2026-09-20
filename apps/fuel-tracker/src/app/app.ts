@@ -16,6 +16,7 @@ export class App {
   protected readonly isLoading = toSignal(this.auth.isLoading$, { initialValue: true });
   protected readonly isAuthenticated = toSignal(this.auth.isAuthenticated$, { initialValue: false });
   protected readonly user = toSignal(this.auth.user$);
+  protected readonly error = toSignal(this.auth.error$);
 
   protected logIn(): void {
     this.auth.loginWithRedirect();

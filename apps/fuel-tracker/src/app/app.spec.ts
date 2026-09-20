@@ -8,19 +8,21 @@ describe('App', () => {
   let isLoading$: BehaviorSubject<boolean>;
   let isAuthenticated$: BehaviorSubject<boolean>;
   let user$: BehaviorSubject<User | null>;
+  let error$: BehaviorSubject<Error | null>;
   let auth: { loginWithRedirect: jest.Mock; logout: jest.Mock };
 
   beforeEach(async () => {
     isLoading$ = new BehaviorSubject(false);
     isAuthenticated$ = new BehaviorSubject(false);
     user$ = new BehaviorSubject<User | null>(null);
+    error$ = new BehaviorSubject<Error | null>(null);
     auth = { loginWithRedirect: jest.fn(), logout: jest.fn() };
 
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
         provideRouter([]),
-        { provide: AuthService, useValue: { isLoading$, isAuthenticated$, user$, ...auth } },
+        { provide: AuthService, useValue: { isLoading$, isAuthenticated$, user$, error$, ...auth } },
       ],
     }).compileComponents();
   });
@@ -70,5 +72,15 @@ describe('App', () => {
 
     el.querySelector<HTMLButtonElement>('.logout-button')?.click();
     expect(auth.logout).toHaveBeenCalledWith({ logoutParams: { returnTo: window.location.origin } });
+  });
+
+  it('displays auth error message on login screen', async () => {
+    error$.next(new Error('Access denied: You are not on the authorized user list.'));
+    const el = await render();
+
+    expect(el.querySelector('.auth-error')).toBeTruthy();
+    expect(el.querySelector('.auth-error p')?.textContent).toBe(
+      'Access denied: You are not on the authorized user list.',
+    );
   });
 });
