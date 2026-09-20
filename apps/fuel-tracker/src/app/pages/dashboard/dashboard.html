@@ -71,6 +71,10 @@
           <strong>{{ metadata.finalTripB | number:'1.1-1' }} miles</strong> at the end.
         </p>
         <p>
+          <strong>Value at reset:</strong> Trip B showed
+          <strong>{{ metadata.tripBValueAtReset | number:'1.1-1' }} miles</strong> before it was reset.
+        </p>
+        <p>
           <strong>Solution:</strong> By calculating backwards from the final odometer ({{ metadata.finalOdometer |
           number }}) minus Trip B, we find the reset occurred at odometer
           <strong>{{ metadata.tripBResetOdometer | number:'1.1-1' }}</strong>.
@@ -78,7 +82,6 @@
         <p><strong>Location:</strong> {{ metadata.tripBResetLocation }} — the second Yellowstone fuel stop.</p>
         <p class="actual-trip">
           <strong>Actual Total Trip:</strong> {{ formattedActualTrip() }} miles
-          <span class="note">(including the 22.2 mi return to start)</span>
         </p>
       </div>
     </div>

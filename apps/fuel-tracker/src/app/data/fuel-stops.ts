@@ -26,6 +26,7 @@ export interface TripMetadata {
   finalOdometer: number;
   distanceToInitialGoMart: number;
   tripBResetOdometer: number;
+  tripBValueAtReset: number;
   actualTotalTrip: number;
   tripBResetLocation: string;
 }
@@ -124,7 +125,8 @@ export const tripMetadata: TripMetadata = {
   finalOdometer: 10907,
   distanceToInitialGoMart: 22.2,
   tripBResetOdometer: 10907 - 2141.2,
-  actualTotalTrip: 10907 - (6027 - 22.2),
+  tripBValueAtReset: 8766 - 6027 + 22.2,
+  actualTotalTrip: 10907 - 6027,
   tripBResetLocation: 'Yellowstone (Canyon), WY',
 };
 
@@ -212,13 +214,16 @@ export function calculateTripStats(): TripStats {
   const cheapest = fuelStops[cheapestIndex];
   const expensive = fuelStops[mostExpensiveIndex];
 
+  // Include the 22.2 miles driven before the first fuel stop in fuel economy calculations
+  const milesForFuelEconomy = lastStop.cumulativeDistance + tripMetadata.distanceToInitialGoMart;
+
   return {
     totalMiles: lastStop.cumulativeDistance,
     totalGallons: lastStop.cumulativeGallons,
     totalCost: lastStop.cumulativeCost,
-    averageMpg: lastStop.cumulativeDistance / lastStop.cumulativeGallons,
+    averageMpg: milesForFuelEconomy / lastStop.cumulativeGallons,
     averagePricePerGallon: lastStop.cumulativeCost / lastStop.cumulativeGallons,
-    costPerMile: lastStop.cumulativeCost / lastStop.cumulativeDistance,
+    costPerMile: lastStop.cumulativeCost / milesForFuelEconomy,
     bestLeg: {
       from: fromBest.location + ', ' + fromBest.state,
       to: toBest.location + ', ' + toBest.state,
