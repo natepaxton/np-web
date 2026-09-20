@@ -1,1 +1,26 @@
-<router-outlet></router-outlet>
+@if (isLoading()) {
+<div class="auth-loading">
+  <div class="loading-spinner"></div>
+  <p>Checking authentication...</p>
+</div>
+} @else if (!isAuthenticated()) {
+<div class="auth-login">
+  <div class="login-card">
+    <h1>Yellowstone Road Trip</h1>
+    <p>Sign in to view the fuel tracker dashboard</p>
+    <button class="login-button" (click)="logIn()">Sign In</button>
+  </div>
+</div>
+} @else {
+<div class="app-shell">
+  <header class="app-header">
+    <div class="user-info">
+      <span class="user-email">{{ user()?.email }}</span>
+      <button class="logout-button" (click)="logOut()">Sign Out</button>
+    </div>
+  </header>
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+</div>
+}
