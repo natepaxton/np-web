@@ -96,8 +96,38 @@
     line-height: 1.6;
   }
 
+  .expand-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--foreground);
+    transition: background-color 0.2s;
+    width: 100%;
+    justify-content: center;
+
+    &:hover {
+      background: var(--accent);
+    }
+
+    .trigger-icon {
+      transition: transform 0.2s;
+      font-size: 0.75rem;
+    }
+  }
+
+  [data-state='open'] .expand-trigger .trigger-icon {
+    transform: rotate(180deg);
+  }
+
   .state-table-wrapper {
     overflow-x: auto;
+    margin-top: 1rem;
   }
 
   .state-table {

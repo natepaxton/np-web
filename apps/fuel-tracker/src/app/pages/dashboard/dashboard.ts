@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, signal } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { HlmCollapsibleImports } from '@spartan-ng/helm/collapsible';
 import { TripMap } from '../../components/trip-map/trip-map';
 import { StatCard } from '../../components/stat-card/stat-card';
 import { MpgChart } from '../../components/mpg-chart/mpg-chart';
@@ -16,7 +17,7 @@ import {
 
 @Component({
   selector: 'ft-dashboard',
-  imports: [TripMap, StatCard, MpgChart, CurrencyPipe, DecimalPipe],
+  imports: [TripMap, StatCard, MpgChart, CurrencyPipe, DecimalPipe, HlmCollapsibleImports],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

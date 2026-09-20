@@ -104,10 +104,14 @@
 
   <!-- State Route Section -->
   <section class="route-section">
-    <div class="section-card">
+    <div hlmCollapsible class="section-card">
       <h2>Route Through States</h2>
       <p class="state-route">{{ stateRoute() }}</p>
-      <div class="state-table-wrapper">
+      <button hlmCollapsibleTrigger class="expand-trigger">
+        <span class="trigger-text">View state-by-state breakdown</span>
+        <span class="trigger-icon">▼</span>
+      </button>
+      <div hlmCollapsibleContent class="state-table-wrapper">
         <table class="state-table">
           <thead>
             <tr>
