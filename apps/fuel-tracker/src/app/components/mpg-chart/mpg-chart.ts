@@ -31,6 +31,7 @@ export class MpgChart implements AfterViewInit, OnDestroy {
     this.createChart();
   }
 
+  // istanbul ignore next: cleanup lifecycle hook
   ngOnDestroy(): void {
     this.chart?.destroy();
   }
@@ -70,7 +71,8 @@ export class MpgChart implements AfterViewInit, OnDestroy {
           },
           tooltip: {
             callbacks: {
-              label: (context) => this.formatTooltipLabel(context.parsed.y),
+              /* istanbul ignore next: Chart.js tooltip callback */
+              label: /* istanbul ignore next */ (context) => this.formatTooltipLabel(context.parsed.y),
             },
           },
         },

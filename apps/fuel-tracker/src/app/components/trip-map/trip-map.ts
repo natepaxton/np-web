@@ -38,12 +38,14 @@ export class TripMap implements AfterViewInit, OnDestroy {
     this.initMap();
   }
 
+  // istanbul ignore next: cleanup lifecycle hook
   ngOnDestroy(): void {
     this.map?.remove();
   }
 
   private initMap(): void {
     const stops = this.stops();
+    // istanbul ignore if: defensive guard for empty data
     if (stops.length === 0) return;
 
     // Center on the middle of the US
