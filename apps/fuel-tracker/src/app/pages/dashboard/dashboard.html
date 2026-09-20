@@ -1,40 +1,20 @@
 <div class="dashboard">
   <header class="dashboard-header">
     <h1>Yellowstone Road Trip Fuel Tracker</h1>
-    <p class="subtitle">
-      {{ stats.numberOfStops }} fuel stops across {{ stats.statesVisited.length }} states
-    </p>
+    <p class="subtitle">{{ stats.numberOfStops }} fuel stops across {{ stats.statesVisited.length }} states</p>
   </header>
 
   <!-- Map Section -->
   <section class="map-section">
-    <ft-trip-map
-      [stops]="stops()"
-      [highlightedStopIndex]="highlightedStop()"
-    />
+    <ft-trip-map [stops]="stops()" [highlightedStopIndex]="highlightedStop()" />
   </section>
 
   <!-- Primary Stats Row -->
   <section class="stats-grid primary-stats">
-    <ft-stat-card
-      title="Total Miles"
-      [value]="formattedTotalMiles()"
-      subtitle="Recorded at fuel stops"
-    />
-    <ft-stat-card
-      title="Average MPG"
-      [value]="formattedAvgMpg()"
-      subtitle="Towing LIV 13SD camper"
-    />
-    <ft-stat-card
-      title="Total Fuel"
-      [value]="formattedTotalGallons()"
-    />
-    <ft-stat-card
-      title="Total Cost"
-      [value]="formattedTotalCost()"
-      [subtitle]="formattedCostPerMile()"
-    />
+    <ft-stat-card title="Total Miles" [value]="formattedTotalMiles()" subtitle="Recorded at fuel stops" />
+    <ft-stat-card title="Average MPG" [value]="formattedAvgMpg()" subtitle="Towing LIV 13SD camper" />
+    <ft-stat-card title="Total Fuel" [value]="formattedTotalGallons()" />
+    <ft-stat-card title="Total Cost" [value]="formattedTotalCost()" [subtitle]="formattedCostPerMile()" />
   </section>
 
   <!-- Best/Worst Stats -->
@@ -91,13 +71,11 @@
           <strong>{{ metadata.finalTripB | number:'1.1-1' }} miles</strong> at the end.
         </p>
         <p>
-          <strong>Solution:</strong> By calculating backwards from the final odometer
-          ({{ metadata.finalOdometer | number }}) minus Trip B, we find the reset occurred at
-          odometer <strong>{{ metadata.tripBResetOdometer | number:'1.1-1' }}</strong>.
+          <strong>Solution:</strong> By calculating backwards from the final odometer ({{ metadata.finalOdometer |
+          number }}) minus Trip B, we find the reset occurred at odometer
+          <strong>{{ metadata.tripBResetOdometer | number:'1.1-1' }}</strong>.
         </p>
-        <p>
-          <strong>Location:</strong> {{ metadata.tripBResetLocation }} — the second Yellowstone fuel stop.
-        </p>
+        <p><strong>Location:</strong> {{ metadata.tripBResetLocation }} — the second Yellowstone fuel stop.</p>
         <p class="actual-trip">
           <strong>Actual Total Trip:</strong> {{ formattedActualTrip() }} miles
           <span class="note">(including the 22.2 mi return to start)</span>

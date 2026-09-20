@@ -21,10 +21,7 @@
             "input": "apps/fuel-tracker/public"
           }
         ],
-        "styles": [
-          "node_modules/leaflet/dist/leaflet.css",
-          "apps/fuel-tracker/src/styles.css"
-        ]
+        "styles": ["node_modules/leaflet/dist/leaflet.css", "apps/fuel-tracker/src/styles.css"]
       },
       "configurations": {
         "production": {

@@ -39,15 +39,11 @@ export class MpgChart implements AfterViewInit, OnDestroy {
     const stops = this.stops();
     const stopsWithMpg = stops.filter((s) => s.mpg !== null);
 
-    const labels = stopsWithMpg.map(
-      (s) => `${s.location}, ${s.state}`
-    );
+    const labels = stopsWithMpg.map((s) => `${s.location}, ${s.state}`);
     const data = stopsWithMpg.map((s) => s.mpg as number);
 
     // Highlight the high MPG segments (camper disconnected)
-    const backgroundColor = data.map((mpg) =>
-      mpg > 14 ? 'oklch(0.65 0.2 145 / 80%)' : 'oklch(0.6 0.2 250 / 80%)'
-    );
+    const backgroundColor = data.map((mpg) => (mpg > 14 ? 'oklch(0.65 0.2 145 / 80%)' : 'oklch(0.6 0.2 250 / 80%)'));
 
     this.chart = new Chart(this.chartCanvas.nativeElement, {
       type: 'bar',
