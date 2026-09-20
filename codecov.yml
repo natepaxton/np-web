@@ -37,10 +37,10 @@ component_management:
       name: auth
       paths:
         - libs/auth/**
-    - component_id: fuel-tracker
-      name: fuel-tracker
+    - component_id: yellowstone
+      name: yellowstone
       paths:
-        - apps/fuel-tracker/**
+        - apps/yellowstone/**
 
 # Mirrors the exclusions in the Jest configs.
 ignore:

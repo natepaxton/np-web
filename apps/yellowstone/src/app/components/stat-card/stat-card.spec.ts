@@ -4,7 +4,7 @@ import { StatCard } from './stat-card';
 
 @Component({
   imports: [StatCard],
-  template: `<ft-stat-card [title]="title" [value]="value" [subtitle]="subtitle" />`,
+  template: `<ys-stat-card [title]="title" [value]="value" [subtitle]="subtitle" />`,
 })
 class TestHost {
   title = 'Test Title';
@@ -25,7 +25,7 @@ describe('StatCard', () => {
   });
 
   it('should create', () => {
-    const statCard = fixture.nativeElement.querySelector('ft-stat-card');
+    const statCard = fixture.nativeElement.querySelector('ys-stat-card');
     expect(statCard).toBeTruthy();
   });
 

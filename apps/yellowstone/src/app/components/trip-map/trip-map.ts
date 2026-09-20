@@ -12,7 +12,7 @@ import * as L from 'leaflet';
 import { FuelStop } from '../../data/fuel-stops';
 
 @Component({
-  selector: 'ft-trip-map',
+  selector: 'ys-trip-map',
   imports: [],
   templateUrl: './trip-map.html',
   styleUrl: './trip-map.scss',

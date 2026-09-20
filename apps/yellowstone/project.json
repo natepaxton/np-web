@@ -1,9 +1,9 @@
 {
-  "name": "fuel-tracker",
+  "name": "yellowstone",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "prefix": "ft",
-  "sourceRoot": "apps/fuel-tracker/src",
+  "prefix": "ys",
+  "sourceRoot": "apps/yellowstone/src",
   "tags": ["type:app"],
   "targets": {
     "build": {
@@ -11,17 +11,17 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/fuel-tracker",
-        "browser": "apps/fuel-tracker/src/main.ts",
-        "tsConfig": "apps/fuel-tracker/tsconfig.app.json",
+        "outputPath": "dist/apps/yellowstone",
+        "browser": "apps/yellowstone/src/main.ts",
+        "tsConfig": "apps/yellowstone/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
           {
             "glob": "**/*",
-            "input": "apps/fuel-tracker/public"
+            "input": "apps/yellowstone/public"
           }
         ],
-        "styles": ["node_modules/leaflet/dist/leaflet.css", "apps/fuel-tracker/src/styles.css"]
+        "styles": ["node_modules/leaflet/dist/leaflet.css", "apps/yellowstone/src/styles.css"]
       },
       "configurations": {
         "production": {
@@ -55,10 +55,10 @@
       },
       "configurations": {
         "production": {
-          "buildTarget": "fuel-tracker:build:production"
+          "buildTarget": "yellowstone:build:production"
         },
         "development": {
-          "buildTarget": "fuel-tracker:build:development"
+          "buildTarget": "yellowstone:build:development"
         }
       }
     },
@@ -69,17 +69,17 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/fuel-tracker/jest.config.cts",
-        "tsConfig": "apps/fuel-tracker/tsconfig.spec.json"
+        "jestConfig": "apps/yellowstone/jest.config.cts",
+        "tsConfig": "apps/yellowstone/tsconfig.spec.json"
       }
     },
     "serve-static": {
       "continuous": true,
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "fuel-tracker:build",
+        "buildTarget": "yellowstone:build",
         "port": 4301,
-        "staticFilePath": "dist/apps/fuel-tracker/browser",
+        "staticFilePath": "dist/apps/yellowstone/browser",
         "spa": true
       }
     }

@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 
 @Component({
-  selector: 'ft-stat-card',
+  selector: 'ys-stat-card',
   imports: [],
   templateUrl: './stat-card.html',
   styleUrl: './stat-card.scss',

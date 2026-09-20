@@ -19,6 +19,14 @@
 } @else {
 <div class="app-shell">
   <header class="app-header">
+    <div class="header-left">
+      <span class="app-title">Yellowstone Road Trip</span>
+      <nav class="main-nav">
+        @for (item of navItems; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" class="nav-link"> {{ item.label }} </a>
+        }
+      </nav>
+    </div>
     <div class="user-info">
       <span class="user-email">{{ user()?.email }}</span>
       <button class="logout-button" (click)="logOut()">Sign Out</button>

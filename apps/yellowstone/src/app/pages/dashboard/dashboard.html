@@ -6,41 +6,41 @@
 
   <!-- Map Section -->
   <section class="map-section">
-    <ft-trip-map [stops]="stops()" [highlightedStopIndex]="highlightedStop()" />
+    <ys-trip-map [stops]="stops()" [highlightedStopIndex]="highlightedStop()" />
   </section>
 
   <!-- Primary Stats Row -->
   <section class="stats-grid primary-stats">
-    <ft-stat-card title="Total Miles" [value]="formattedTotalMiles()" subtitle="Recorded at fuel stops" />
-    <ft-stat-card title="Average MPG" [value]="formattedAvgMpg()" subtitle="Towing LIV 13SD camper" />
-    <ft-stat-card title="Total Fuel" [value]="formattedTotalGallons()" [subtitle]="formattedAvgGallonsPerFillUp()" />
-    <ft-stat-card title="Total Cost" [value]="formattedTotalCost()" [subtitle]="formattedCostPerMile()" />
+    <ys-stat-card title="Total Miles" [value]="formattedTotalMiles()" subtitle="Recorded at fuel stops" />
+    <ys-stat-card title="Average MPG" [value]="formattedAvgMpg()" subtitle="Towing LIV 13SD camper" />
+    <ys-stat-card title="Total Fuel" [value]="formattedTotalGallons()" [subtitle]="formattedAvgGallonsPerFillUp()" />
+    <ys-stat-card title="Total Cost" [value]="formattedTotalCost()" [subtitle]="formattedCostPerMile()" />
   </section>
 
   <!-- Best/Worst Stats -->
   <section class="stats-grid highlight-stats">
-    <ft-stat-card
+    <ys-stat-card
       icon="🏆"
       title="Best Leg"
       [value]="formattedBestMpg()"
       [subtitle]="bestLegSubtitle()"
       variant="success"
     />
-    <ft-stat-card
+    <ys-stat-card
       icon="📉"
       title="Worst Leg"
       [value]="formattedWorstMpg()"
       [subtitle]="worstLegSubtitle()"
       variant="warning"
     />
-    <ft-stat-card
+    <ys-stat-card
       icon="💰"
       title="Cheapest Gas"
       [value]="formattedCheapestPrice()"
       [subtitle]="stats.cheapestGas.location"
       variant="success"
     />
-    <ft-stat-card
+    <ys-stat-card
       icon="💸"
       title="Most Expensive Gas"
       [value]="formattedMostExpensivePrice()"
@@ -53,20 +53,20 @@
   <section class="chart-section">
     <div class="section-card">
       <h2>Fuel Economy by Leg</h2>
-      <ft-mpg-chart [stops]="stops()" [averageMpg]="stats.averageMpg" />
+      <ys-mpg-chart [stops]="stops()" [averageMpg]="stats.averageMpg" />
     </div>
   </section>
 
   <!-- Driving Patterns Section -->
   <section class="stats-grid driving-stats">
-    <ft-stat-card
+    <ys-stat-card
       title="Avg Between Stops"
       [value]="formattedAvgDistanceBetweenStops()"
       subtitle="Average leg distance"
     />
-    <ft-stat-card title="Longest Leg" [value]="formattedLongestLeg()" [subtitle]="longestLegSubtitle()" />
-    <ft-stat-card title="Shortest Leg" [value]="formattedShortestLeg()" [subtitle]="shortestLegSubtitle()" />
-    <ft-stat-card
+    <ys-stat-card title="Longest Leg" [value]="formattedLongestLeg()" [subtitle]="longestLegSubtitle()" />
+    <ys-stat-card title="Shortest Leg" [value]="formattedShortestLeg()" [subtitle]="shortestLegSubtitle()" />
+    <ys-stat-card
       title="Furthest from Start"
       [value]="formattedFurthestPoint()"
       [subtitle]="stats.furthestPointFromStart.location"

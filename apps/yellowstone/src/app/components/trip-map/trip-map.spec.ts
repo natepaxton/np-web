@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component, viewChild } from '@angular/core';
-import { MpgChart } from './mpg-chart';
+import { Component, signal } from '@angular/core';
+import { TripMap } from './trip-map';
 import { FuelStop } from '../../data/fuel-stops';
 
 const mockStops: FuelStop[] = [
@@ -35,20 +35,20 @@ const mockStops: FuelStop[] = [
     cumulativeGallons: 22,
     lat: 38.2,
     lng: -83.0,
+    notes: 'Test note',
   },
 ];
 
 @Component({
-  imports: [MpgChart],
-  template: `<ft-mpg-chart [stops]="stops" [averageMpg]="averageMpg" />`,
+  imports: [TripMap],
+  template: `<ys-trip-map [stops]="stops" [highlightedStopIndex]="highlightedIndex()" />`,
 })
 class TestHost {
   stops = mockStops;
-  averageMpg = 12.5;
-  chart = viewChild(MpgChart);
+  highlightedIndex = signal<number | null>(null);
 }
 
-describe('MpgChart', () => {
+describe('TripMap', () => {
   let fixture: ComponentFixture<TestHost>;
   let host: TestHost;
 
@@ -63,29 +63,27 @@ describe('MpgChart', () => {
   });
 
   it('should create', () => {
-    const chart = fixture.nativeElement.querySelector('ft-mpg-chart');
-    expect(chart).toBeTruthy();
+    const map = fixture.nativeElement.querySelector('ys-trip-map');
+    expect(map).toBeTruthy();
   });
 
-  it('should contain a canvas element', () => {
-    const canvas = fixture.nativeElement.querySelector('canvas');
-    expect(canvas).toBeTruthy();
+  it('should contain a map container', () => {
+    const mapContainer = fixture.nativeElement.querySelector('.map-container');
+    expect(mapContainer).toBeTruthy();
   });
 
-  describe('formatTooltipLabel', () => {
-    it('should format a valid MPG value', () => {
-      const chart = host.chart();
-      expect(chart?.formatTooltipLabel(12.567)).toBe('12.6 MPG');
-    });
+  it('should highlight a stop when highlightedStopIndex changes', () => {
+    // Set highlighted index to trigger the effect and updateHighlight
+    host.highlightedIndex.set(1);
+    fixture.detectChanges();
 
-    it('should return empty string for null value', () => {
-      const chart = host.chart();
-      expect(chart?.formatTooltipLabel(null)).toBe('');
-    });
+    // The effect should have been triggered - we just verify no errors occur
+    expect(host.highlightedIndex()).toBe(1);
+  });
 
-    it('should handle zero value', () => {
-      const chart = host.chart();
-      expect(chart?.formatTooltipLabel(0)).toBe('0.0 MPG');
-    });
+  it('should handle highlighting with index 0', () => {
+    host.highlightedIndex.set(0);
+    fixture.detectChanges();
+    expect(host.highlightedIndex()).toBe(0);
   });
 });

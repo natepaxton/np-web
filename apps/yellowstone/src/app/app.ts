@@ -5,13 +5,15 @@ import { AuthService } from '@auth0/auth0-angular';
 
 @Component({
   imports: [RouterModule],
-  selector: 'ft-root',
+  selector: 'ys-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
   private readonly auth = inject(AuthService);
+
+  protected readonly navItems = [{ label: 'Fuel', path: '/fuel' }];
 
   protected readonly isLoading = toSignal(this.auth.isLoading$, { initialValue: true });
   protected readonly isAuthenticated = toSignal(this.auth.isAuthenticated$, { initialValue: false });

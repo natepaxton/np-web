@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component, signal } from '@angular/core';
-import { TripMap } from './trip-map';
+import { Component, viewChild } from '@angular/core';
+import { MpgChart } from './mpg-chart';
 import { FuelStop } from '../../data/fuel-stops';
 
 const mockStops: FuelStop[] = [
@@ -35,20 +35,20 @@ const mockStops: FuelStop[] = [
     cumulativeGallons: 22,
     lat: 38.2,
     lng: -83.0,
-    notes: 'Test note',
   },
 ];
 
 @Component({
-  imports: [TripMap],
-  template: `<ft-trip-map [stops]="stops" [highlightedStopIndex]="highlightedIndex()" />`,
+  imports: [MpgChart],
+  template: `<ys-mpg-chart [stops]="stops" [averageMpg]="averageMpg" />`,
 })
 class TestHost {
   stops = mockStops;
-  highlightedIndex = signal<number | null>(null);
+  averageMpg = 12.5;
+  chart = viewChild(MpgChart);
 }
 
-describe('TripMap', () => {
+describe('MpgChart', () => {
   let fixture: ComponentFixture<TestHost>;
   let host: TestHost;
 
@@ -63,27 +63,29 @@ describe('TripMap', () => {
   });
 
   it('should create', () => {
-    const map = fixture.nativeElement.querySelector('ft-trip-map');
-    expect(map).toBeTruthy();
+    const chart = fixture.nativeElement.querySelector('ys-mpg-chart');
+    expect(chart).toBeTruthy();
   });
 
-  it('should contain a map container', () => {
-    const mapContainer = fixture.nativeElement.querySelector('.map-container');
-    expect(mapContainer).toBeTruthy();
+  it('should contain a canvas element', () => {
+    const canvas = fixture.nativeElement.querySelector('canvas');
+    expect(canvas).toBeTruthy();
   });
 
-  it('should highlight a stop when highlightedStopIndex changes', () => {
-    // Set highlighted index to trigger the effect and updateHighlight
-    host.highlightedIndex.set(1);
-    fixture.detectChanges();
+  describe('formatTooltipLabel', () => {
+    it('should format a valid MPG value', () => {
+      const chart = host.chart();
+      expect(chart?.formatTooltipLabel(12.567)).toBe('12.6 MPG');
+    });
 
-    // The effect should have been triggered - we just verify no errors occur
-    expect(host.highlightedIndex()).toBe(1);
-  });
+    it('should return empty string for null value', () => {
+      const chart = host.chart();
+      expect(chart?.formatTooltipLabel(null)).toBe('');
+    });
 
-  it('should handle highlighting with index 0', () => {
-    host.highlightedIndex.set(0);
-    fixture.detectChanges();
-    expect(host.highlightedIndex()).toBe(0);
+    it('should handle zero value', () => {
+      const chart = host.chart();
+      expect(chart?.formatTooltipLabel(0)).toBe('0.0 MPG');
+    });
   });
 });
