@@ -13,7 +13,7 @@
   <section class="stats-grid primary-stats">
     <ft-stat-card title="Total Miles" [value]="formattedTotalMiles()" subtitle="Recorded at fuel stops" />
     <ft-stat-card title="Average MPG" [value]="formattedAvgMpg()" subtitle="Towing LIV 13SD camper" />
-    <ft-stat-card title="Total Fuel" [value]="formattedTotalGallons()" />
+    <ft-stat-card title="Total Fuel" [value]="formattedTotalGallons()" [subtitle]="formattedAvgGallonsPerFillUp()" />
     <ft-stat-card title="Total Cost" [value]="formattedTotalCost()" [subtitle]="formattedCostPerMile()" />
   </section>
 

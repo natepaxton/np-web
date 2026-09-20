@@ -51,6 +51,10 @@ export class Dashboard {
 
   readonly formattedTotalGallons = computed(() => this.stats.totalGallons.toFixed(1) + ' gal');
 
+  readonly formattedAvgGallonsPerFillUp = computed(() =>
+    (this.stats.totalGallons / this.stats.numberOfStops).toFixed(1) + ' gal avg per fill',
+  );
+
   readonly formattedCostPerMile = computed(() => '$' + this.stats.costPerMile.toFixed(2) + '/mile');
 
   readonly formattedBestMpg = computed(() => this.stats.bestLeg.mpg.toFixed(1) + ' MPG');
