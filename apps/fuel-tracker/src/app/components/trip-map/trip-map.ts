@@ -66,7 +66,7 @@ export class TripMap implements AfterViewInit, OnDestroy {
 
     // Add markers for each stop
     stops.forEach((stop, index) => {
-      const marker = L.marker([stop.lat, stop.lng], { icon: iconDefault }).addTo(this.map!);
+      const marker = L.marker([stop.lat, stop.lng], { icon: iconDefault }).addTo(this.map as L.Map);
 
       const mpgText = stop.mpg ? `${stop.mpg.toFixed(1)} MPG` : 'Start';
       const popupContent = `
