@@ -67,16 +67,7 @@ const rawStops: RawStop[] = [
   { location: 'Spearfish', state: 'SD', price: 4.039, gallons: 10.026, odometer: 8151, lat: 44.4908, lng: -103.8594 },
   { location: 'Gillette', state: 'WY', price: 4.359, gallons: 9.641, odometer: 8286, lat: 44.2911, lng: -105.5022 },
   { location: 'Lovell', state: 'WY', price: 4.429, gallons: 15.128, odometer: 8495, lat: 44.8375, lng: -108.3897 },
-  {
-    location: 'Cody',
-    state: 'WY',
-    price: 4.499,
-    gallons: 4.069,
-    odometer: 8552,
-    lat: 44.5263,
-    lng: -109.0565,
-    notes: 'Camper disconnected',
-  },
+  { location: 'Cody', state: 'WY', price: 4.499, gallons: 4.069, odometer: 8552, lat: 44.5263, lng: -109.0565 },
   {
     location: 'Yellowstone (Old Faithful)',
     state: 'WY',
@@ -172,6 +163,52 @@ export interface TripStats {
   mostExpensiveGas: { location: string; price: number; index: number };
   statesVisited: string[];
   numberOfStops: number;
+  averageDistanceBetweenStops: number;
+  longestLeg: { from: string; to: string; miles: number; index: number };
+  shortestLeg: { from: string; to: string; miles: number; index: number };
+  furthestPointFromStart: { location: string; distanceMiles: number; index: number };
+}
+
+export interface StateStats {
+  state: string;
+  stops: number;
+  miles: number;
+  gallons: number;
+  cost: number;
+  averagePrice: number;
+}
+
+export interface ElevationData {
+  highPoint: { location: string; elevation: number; description: string };
+  lowPoint: { location: string; elevation: number; description: string };
+}
+
+export const elevationData: ElevationData = {
+  highPoint: {
+    location: 'Beartooth Pass, US-212',
+    elevation: 10947,
+    description: 'Highest point on US-212 in Shoshone National Forest',
+  },
+  lowPoint: {
+    location: 'St. Louis, MO',
+    elevation: 466,
+    description: 'Near the Mississippi River',
+  },
+};
+
+// Calculate distance between two lat/lng points using Haversine formula (returns miles)
+function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 3959; // Earth's radius in miles
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 }
 
 export function calculateTripStats(): TripStats {
@@ -183,6 +220,15 @@ export function calculateTripStats(): TripStats {
   let mostExpensiveIndex = 0;
   let cheapestPrice = Infinity;
   let mostExpensivePrice = 0;
+  let longestLegIndex = 1;
+  let shortestLegIndex = 1;
+  let longestLegMiles = 0;
+  let shortestLegMiles = Infinity;
+  let furthestIndex = 0;
+  let furthestDistance = 0;
+
+  const startLat = fuelStops[0].lat;
+  const startLng = fuelStops[0].lng;
 
   fuelStops.forEach((stop, idx) => {
     if (stop.mpg !== null) {
@@ -203,6 +249,21 @@ export function calculateTripStats(): TripStats {
       mostExpensivePrice = stop.pricePerGallon;
       mostExpensiveIndex = idx;
     }
+    if (idx > 0) {
+      if (stop.distanceFromPrevious > longestLegMiles) {
+        longestLegMiles = stop.distanceFromPrevious;
+        longestLegIndex = idx;
+      }
+      if (stop.distanceFromPrevious < shortestLegMiles) {
+        shortestLegMiles = stop.distanceFromPrevious;
+        shortestLegIndex = idx;
+      }
+    }
+    const distanceFromStart = haversineDistance(startLat, startLng, stop.lat, stop.lng);
+    if (distanceFromStart > furthestDistance) {
+      furthestDistance = distanceFromStart;
+      furthestIndex = idx;
+    }
   });
 
   const lastStop = fuelStops[fuelStops.length - 1];
@@ -213,9 +274,19 @@ export function calculateTripStats(): TripStats {
   const toWorst = fuelStops[worstLegIndex];
   const cheapest = fuelStops[cheapestIndex];
   const expensive = fuelStops[mostExpensiveIndex];
+  const fromLongest = fuelStops[longestLegIndex - 1];
+  const toLongest = fuelStops[longestLegIndex];
+  const fromShortest = fuelStops[shortestLegIndex - 1];
+  const toShortest = fuelStops[shortestLegIndex];
+  const furthestStop = fuelStops[furthestIndex];
 
   // Include the 22.2 miles driven before the first fuel stop in fuel economy calculations
   const milesForFuelEconomy = lastStop.cumulativeDistance + tripMetadata.distanceToInitialGoMart;
+
+  // Average distance between stops (excluding first stop which has 0 distance)
+  const legsWithDistance = fuelStops.filter((s) => s.distanceFromPrevious > 0);
+  const averageDistanceBetweenStops =
+    legsWithDistance.reduce((sum, s) => sum + s.distanceFromPrevious, 0) / legsWithDistance.length;
 
   return {
     totalMiles: lastStop.cumulativeDistance,
@@ -248,5 +319,63 @@ export function calculateTripStats(): TripStats {
     },
     statesVisited,
     numberOfStops: fuelStops.length,
+    averageDistanceBetweenStops,
+    longestLeg: {
+      from: fromLongest.location + ', ' + fromLongest.state,
+      to: toLongest.location + ', ' + toLongest.state,
+      miles: longestLegMiles,
+      index: longestLegIndex,
+    },
+    shortestLeg: {
+      from: fromShortest.location + ', ' + fromShortest.state,
+      to: toShortest.location + ', ' + toShortest.state,
+      miles: shortestLegMiles,
+      index: shortestLegIndex,
+    },
+    furthestPointFromStart: {
+      location: furthestStop.location + ', ' + furthestStop.state,
+      distanceMiles: furthestDistance,
+      index: furthestIndex,
+    },
   };
+}
+
+export function calculateStateStats(): StateStats[] {
+  const stateOrder: string[] = [];
+  const stateData: Map<string, { stops: number; gallons: number; cost: number; entryOdometer: number; exitOdometer: number }> = new Map();
+
+  fuelStops.forEach((stop, idx) => {
+    if (!stateData.has(stop.state)) {
+      stateOrder.push(stop.state);
+      stateData.set(stop.state, {
+        stops: 0,
+        gallons: 0,
+        cost: 0,
+        entryOdometer: stop.odometer,
+        exitOdometer: stop.odometer,
+      });
+    }
+    const data = stateData.get(stop.state)!;
+    data.stops++;
+    data.gallons += stop.gallons;
+    data.cost += stop.cost;
+    data.exitOdometer = stop.odometer;
+
+    // If next stop is in a different state, use that as exit point
+    if (idx < fuelStops.length - 1 && fuelStops[idx + 1].state !== stop.state) {
+      data.exitOdometer = fuelStops[idx + 1].odometer;
+    }
+  });
+
+  return stateOrder.map((state) => {
+    const data = stateData.get(state)!;
+    return {
+      state,
+      stops: data.stops,
+      miles: data.exitOdometer - data.entryOdometer,
+      gallons: data.gallons,
+      cost: data.cost,
+      averagePrice: data.cost / data.gallons,
+    };
+  });
 }
