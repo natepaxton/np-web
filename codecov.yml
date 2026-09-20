@@ -37,6 +37,10 @@ component_management:
       name: auth
       paths:
         - libs/auth/**
+    - component_id: fuel-tracker
+      name: fuel-tracker
+      paths:
+        - apps/fuel-tracker/**
 
 # Mirrors the exclusions in the Jest configs.
 ignore:

@@ -20,7 +20,8 @@
       "@spartan-ng/helm/utils": ["./libs/helm/utils/src/index.ts"],
       "@spartan-ng/helm/card": ["./libs/helm/card/src/index.ts"],
       "@spartan-ng/helm/input": ["./libs/helm/input/src/index.ts"],
-      "@np-aspire/auth": ["./libs/auth/src/index.ts"]
+      "@np-aspire/auth": ["./libs/auth/src/index.ts"],
+      "@spartan-ng/helm/collapsible": ["./libs/helm/collapsible/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

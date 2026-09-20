@@ -1,0 +1,201 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <h1>Yellowstone Road Trip Fuel Tracker</h1>
+    <p class="subtitle">{{ stats.numberOfStops }} fuel stops across {{ stats.statesVisited.length }} states</p>
+  </header>
+
+  <!-- Map Section -->
+  <section class="map-section">
+    <ft-trip-map [stops]="stops()" [highlightedStopIndex]="highlightedStop()" />
+  </section>
+
+  <!-- Primary Stats Row -->
+  <section class="stats-grid primary-stats">
+    <ft-stat-card title="Total Miles" [value]="formattedTotalMiles()" subtitle="Recorded at fuel stops" />
+    <ft-stat-card title="Average MPG" [value]="formattedAvgMpg()" subtitle="Towing LIV 13SD camper" />
+    <ft-stat-card title="Total Fuel" [value]="formattedTotalGallons()" [subtitle]="formattedAvgGallonsPerFillUp()" />
+    <ft-stat-card title="Total Cost" [value]="formattedTotalCost()" [subtitle]="formattedCostPerMile()" />
+  </section>
+
+  <!-- Best/Worst Stats -->
+  <section class="stats-grid highlight-stats">
+    <ft-stat-card
+      icon="🏆"
+      title="Best Leg"
+      [value]="formattedBestMpg()"
+      [subtitle]="bestLegSubtitle()"
+      variant="success"
+    />
+    <ft-stat-card
+      icon="📉"
+      title="Worst Leg"
+      [value]="formattedWorstMpg()"
+      [subtitle]="worstLegSubtitle()"
+      variant="warning"
+    />
+    <ft-stat-card
+      icon="💰"
+      title="Cheapest Gas"
+      [value]="formattedCheapestPrice()"
+      [subtitle]="stats.cheapestGas.location"
+      variant="success"
+    />
+    <ft-stat-card
+      icon="💸"
+      title="Most Expensive Gas"
+      [value]="formattedMostExpensivePrice()"
+      [subtitle]="stats.mostExpensiveGas.location"
+      variant="warning"
+    />
+  </section>
+
+  <!-- MPG Chart -->
+  <section class="chart-section">
+    <div class="section-card">
+      <h2>Fuel Economy by Leg</h2>
+      <ft-mpg-chart [stops]="stops()" [averageMpg]="stats.averageMpg" />
+    </div>
+  </section>
+
+  <!-- Driving Patterns Section -->
+  <section class="stats-grid driving-stats">
+    <ft-stat-card
+      title="Avg Between Stops"
+      [value]="formattedAvgDistanceBetweenStops()"
+      subtitle="Average leg distance"
+    />
+    <ft-stat-card title="Longest Leg" [value]="formattedLongestLeg()" [subtitle]="longestLegSubtitle()" />
+    <ft-stat-card title="Shortest Leg" [value]="formattedShortestLeg()" [subtitle]="shortestLegSubtitle()" />
+    <ft-stat-card
+      title="Furthest from Start"
+      [value]="formattedFurthestPoint()"
+      [subtitle]="stats.furthestPointFromStart.location"
+    />
+  </section>
+
+  <!-- Journey Extremes Section -->
+  <section class="extremes-section">
+    <div class="section-card">
+      <h2>Journey Extremes</h2>
+      <div class="extremes-layout">
+        <!-- Compass Visualization -->
+        <div class="compass-container">
+          <div class="compass">
+            <div class="compass-point north">
+              <span class="direction">N</span>
+              <span class="location">{{ extremes.north.location }}</span>
+            </div>
+            <div class="compass-point south">
+              <span class="direction">S</span>
+              <span class="location">{{ extremes.south.location }}</span>
+            </div>
+            <div class="compass-point east">
+              <span class="direction">E</span>
+              <span class="location">{{ extremes.east.location }}</span>
+              @if (extremes.east.note) {
+              <span class="note">{{ extremes.east.note }}</span>
+              }
+            </div>
+            <div class="compass-point west">
+              <span class="direction">W</span>
+              <span class="location">{{ extremes.west.location }}</span>
+            </div>
+            <div class="compass-center">
+              <div class="span-label ns">{{ formattedNorthSouthSpan() }}</div>
+              <div class="span-label ew">{{ formattedEastWestSpan() }}</div>
+            </div>
+            <div class="compass-line vertical"></div>
+            <div class="compass-line horizontal"></div>
+          </div>
+        </div>
+
+        <!-- Elevation Stats -->
+        <div class="elevation-stats">
+          <div class="elevation-item high">
+            <span class="icon">⛰️</span>
+            <div class="details">
+              <span class="label">Highest Point</span>
+              <span class="value">{{ formattedHighElevation() }}</span>
+              <span class="location">{{ extremes.highPoint.location }}</span>
+            </div>
+          </div>
+          <div class="elevation-bar">
+            <div class="bar-fill"></div>
+            <span class="span-value">{{ formattedElevationSpan() }} elevation span</span>
+          </div>
+          <div class="elevation-item low">
+            <span class="icon">🌊</span>
+            <div class="details">
+              <span class="label">Lowest Point</span>
+              <span class="value">{{ formattedLowElevation() }}</span>
+              <span class="location">{{ extremes.lowPoint.location }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- State Route Section -->
+  <section class="route-section">
+    <div hlmCollapsible class="section-card">
+      <h2>Route Through States</h2>
+      <div class="state-route-row">
+        <p class="state-route">{{ stateRoute() }}</p>
+        <button hlmCollapsibleTrigger class="expand-trigger" aria-label="Toggle state details">
+          <span class="trigger-icon">▼</span>
+        </button>
+      </div>
+      <div hlmCollapsibleContent class="state-table-wrapper">
+        <table class="state-table">
+          <thead>
+            <tr>
+              <th>State</th>
+              <th>Stops</th>
+              <th>Miles</th>
+              <th>Gallons</th>
+              <th>Cost</th>
+              <th>Avg Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (state of stateStats; track state.state) {
+            <tr>
+              <td>{{ state.state }}</td>
+              <td>{{ state.stops }}</td>
+              <td>{{ state.miles | number:'1.0-0' }}</td>
+              <td>{{ state.gallons | number:'1.1-1' }}</td>
+              <td>{{ state.cost | currency }}</td>
+              <td>{{ state.averagePrice | currency:'USD':'symbol':'1.3-3' }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trip B Mystery Section -->
+  <section class="mystery-section">
+    <div class="section-card mystery-card">
+      <h2>🔍 Trip B Mystery Solved</h2>
+      <div class="mystery-content">
+        <p>
+          <strong>Problem:</strong> Trip B was accidentally reset mid-journey, showing only
+          <strong>{{ metadata.finalTripB | number:'1.1-1' }} miles</strong> at the end.
+        </p>
+        <p>
+          <strong>Value at reset:</strong> Trip B showed
+          <strong>{{ metadata.tripBValueAtReset | number:'1.1-1' }} miles</strong> before it was reset.
+        </p>
+        <p>
+          <strong>Solution:</strong> By calculating backwards from the final odometer ({{ metadata.finalOdometer |
+          number }}) minus Trip B, we find the reset occurred at odometer
+          <strong>{{ metadata.tripBResetOdometer | number:'1.1-1' }}</strong>.
+        </p>
+        <p><strong>Location:</strong> {{ metadata.tripBResetLocation }} — the second Yellowstone fuel stop.</p>
+        <p class="actual-trip"><strong>Actual Total Trip:</strong> {{ formattedActualTrip() }} miles</p>
+      </div>
+    </div>
+  </section>
+</div>
