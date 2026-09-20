@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-test('has title', async ({ page }) => {
+test('shows login screen for unauthenticated users', async ({ page }) => {
   await page.goto('/');
 
-  // Expect h1 to contain the dashboard title.
-  expect(await page.locator('h1').innerText()).toContain('Yellowstone Road Trip Fuel Tracker');
+  // Unauthenticated users should see the login screen
+  await expect(page.locator('.login-card h1')).toHaveText('Yellowstone Road Trip');
+  await expect(page.locator('.login-card p')).toHaveText('Sign in to view the fuel tracker dashboard');
+  await expect(page.locator('.login-button')).toBeVisible();
 });
