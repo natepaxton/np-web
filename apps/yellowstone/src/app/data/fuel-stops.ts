@@ -328,7 +328,7 @@ export function calculateTripStats(): TripStats {
     legsWithDistance.reduce((sum, s) => sum + s.distanceFromPrevious, 0) / legsWithDistance.length;
 
   return {
-    totalMiles: lastStop.cumulativeDistance,
+    totalMiles: tripMetadata.actualTotalTrip,
     totalGallons: lastStop.cumulativeGallons,
     totalCost: lastStop.cumulativeCost,
     averageMpg: milesForFuelEconomy / lastStop.cumulativeGallons,
