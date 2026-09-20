@@ -13,7 +13,7 @@ import { FuelStop } from '../../data/fuel-stops';
 Chart.register(...registerables);
 
 @Component({
-  selector: 'ft-mpg-chart',
+  selector: 'ys-mpg-chart',
   imports: [],
   templateUrl: './mpg-chart.html',
   styleUrl: './mpg-chart.scss',

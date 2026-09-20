@@ -16,7 +16,7 @@ import {
 } from '../../data/fuel-stops';
 
 @Component({
-  selector: 'ft-dashboard',
+  selector: 'ys-dashboard',
   imports: [TripMap, StatCard, MpgChart, CurrencyPipe, DecimalPipe, HlmCollapsibleImports],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',

@@ -83,4 +83,13 @@ describe('App', () => {
       'Access denied: You are not on the authorized user list.',
     );
   });
+
+  it('shows navigation with Fuel link when authenticated', async () => {
+    isAuthenticated$.next(true);
+    user$.next({ email: 'test@example.com' });
+    const el = await render();
+
+    expect(el.querySelector('.app-title')?.textContent).toBe('Yellowstone Road Trip');
+    expect(el.querySelector('.nav-link')?.textContent?.trim()).toBe('Fuel');
+  });
 });

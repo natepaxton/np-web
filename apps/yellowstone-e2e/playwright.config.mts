@@ -31,7 +31,7 @@ export default defineConfig({
   },
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npx nx run fuel-tracker:serve',
+    command: 'npx nx run yellowstone:serve',
     url: 'http://localhost:4301',
     reuseExistingServer: true,
     cwd: workspaceRoot,

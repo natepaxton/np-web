@@ -1,8 +1,8 @@
 module.exports = {
-  displayName: 'fuel-tracker',
+  displayName: 'yellowstone',
   preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../coverage/apps/fuel-tracker',
+  coverageDirectory: '../../coverage/apps/yellowstone',
   coverageReporters: ['lcov', 'text-summary', 'json-summary'],
   collectCoverageFrom: [
     'src/**/*.ts',
