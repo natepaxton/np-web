@@ -1,0 +1,146 @@
+:host {
+  display: block;
+}
+
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dashboard-header {
+  text-align: center;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  .subtitle {
+    color: var(--muted-foreground);
+    margin-top: 0.5rem;
+  }
+}
+
+.map-section {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.stats-grid {
+  display: grid;
+  gap: 1rem;
+
+  &.primary-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  &.highlight-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 1200px) {
+    &.primary-stats,
+    &.highlight-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    &.primary-stats,
+    &.highlight-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.chart-section {
+  .section-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+
+    h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+      }
+
+      &.legend-normal::before {
+        background: oklch(0.6 0.2 250 / 80%);
+      }
+
+      &.legend-high::before {
+        background: oklch(0.65 0.2 145 / 80%);
+      }
+    }
+  }
+}
+
+.mystery-section {
+  .mystery-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    border-left: 4px solid oklch(0.6 0.2 250);
+
+    h2 {
+      margin: 0 0 1rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+  }
+
+  .mystery-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    p {
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .actual-trip {
+      font-size: 1.125rem;
+      padding: 1rem;
+      background: var(--muted);
+      border-radius: var(--radius);
+      margin-top: 0.5rem;
+
+      .note {
+        font-size: 0.875rem;
+        color: var(--muted-foreground);
+      }
+    }
+  }
+}

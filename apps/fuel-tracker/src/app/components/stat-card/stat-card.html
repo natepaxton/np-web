@@ -1,0 +1,12 @@
+<div class="stat-card" [class]="'variant-' + variant()">
+  @if (icon()) {
+    <span class="icon">{{ icon() }}</span>
+  }
+  <div class="content">
+    <span class="title">{{ title() }}</span>
+    <span class="value">{{ value() }}</span>
+    @if (subtitle()) {
+      <span class="subtitle">{{ subtitle() }}</span>
+    }
+  </div>
+</div>

@@ -5,3 +5,5 @@
 package-lock.json
 # spartan/ui helm code keeps upstream formatting so CLI migrations produce small diffs
 /libs/helm
+
+.angular

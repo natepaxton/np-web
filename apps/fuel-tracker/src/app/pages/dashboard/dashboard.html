@@ -1,0 +1,108 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <h1>Yellowstone Road Trip Fuel Tracker</h1>
+    <p class="subtitle">
+      {{ stats.numberOfStops }} fuel stops across {{ stats.statesVisited.length }} states
+    </p>
+  </header>
+
+  <!-- Map Section -->
+  <section class="map-section">
+    <ft-trip-map
+      [stops]="stops()"
+      [highlightedStopIndex]="highlightedStop()"
+    />
+  </section>
+
+  <!-- Primary Stats Row -->
+  <section class="stats-grid primary-stats">
+    <ft-stat-card
+      title="Total Miles"
+      [value]="formattedTotalMiles()"
+      subtitle="Recorded at fuel stops"
+    />
+    <ft-stat-card
+      title="Average MPG"
+      [value]="formattedAvgMpg()"
+      subtitle="Towing LIV 13SD camper"
+    />
+    <ft-stat-card
+      title="Total Fuel"
+      [value]="formattedTotalGallons()"
+    />
+    <ft-stat-card
+      title="Total Cost"
+      [value]="formattedTotalCost()"
+      [subtitle]="formattedCostPerMile()"
+    />
+  </section>
+
+  <!-- Best/Worst Stats -->
+  <section class="stats-grid highlight-stats">
+    <ft-stat-card
+      icon="🏆"
+      title="Best Leg"
+      [value]="formattedBestMpg()"
+      [subtitle]="bestLegSubtitle()"
+      variant="success"
+    />
+    <ft-stat-card
+      icon="📉"
+      title="Worst Leg"
+      [value]="formattedWorstMpg()"
+      [subtitle]="worstLegSubtitle()"
+      variant="warning"
+    />
+    <ft-stat-card
+      icon="💰"
+      title="Cheapest Gas"
+      [value]="formattedCheapestPrice()"
+      [subtitle]="stats.cheapestGas.location"
+      variant="success"
+    />
+    <ft-stat-card
+      icon="💸"
+      title="Most Expensive Gas"
+      [value]="formattedMostExpensivePrice()"
+      [subtitle]="stats.mostExpensiveGas.location"
+      variant="warning"
+    />
+  </section>
+
+  <!-- MPG Chart -->
+  <section class="chart-section">
+    <div class="section-card">
+      <h2>Fuel Economy by Leg</h2>
+      <p class="chart-legend">
+        <span class="legend-item legend-normal">Normal (with camper)</span>
+        <span class="legend-item legend-high">High MPG (camper disconnected)</span>
+      </p>
+      <ft-mpg-chart [stops]="stops()" [averageMpg]="stats.averageMpg" />
+    </div>
+  </section>
+
+  <!-- Trip B Mystery Section -->
+  <section class="mystery-section">
+    <div class="section-card mystery-card">
+      <h2>🔍 Trip B Mystery Solved</h2>
+      <div class="mystery-content">
+        <p>
+          <strong>Problem:</strong> Trip B was accidentally reset mid-journey, showing only
+          <strong>{{ metadata.finalTripB | number:'1.1-1' }} miles</strong> at the end.
+        </p>
+        <p>
+          <strong>Solution:</strong> By calculating backwards from the final odometer
+          ({{ metadata.finalOdometer | number }}) minus Trip B, we find the reset occurred at
+          odometer <strong>{{ metadata.tripBResetOdometer | number:'1.1-1' }}</strong>.
+        </p>
+        <p>
+          <strong>Location:</strong> {{ metadata.tripBResetLocation }} — the second Yellowstone fuel stop.
+        </p>
+        <p class="actual-trip">
+          <strong>Actual Total Trip:</strong> {{ formattedActualTrip() }} miles
+          <span class="note">(including the 22.2 mi return to start)</span>
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
