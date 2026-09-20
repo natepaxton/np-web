@@ -52,8 +52,8 @@ export class Dashboard {
 
   readonly formattedTotalGallons = computed(() => this.stats.totalGallons.toFixed(1) + ' gal');
 
-  readonly formattedAvgGallonsPerFillUp = computed(() =>
-    (this.stats.totalGallons / this.stats.numberOfStops).toFixed(1) + ' gal avg per fill',
+  readonly formattedAvgGallonsPerFillUp = computed(
+    () => (this.stats.totalGallons / this.stats.numberOfStops).toFixed(1) + ' gal avg per fill',
   );
 
   readonly formattedCostPerMile = computed(() => '$' + this.stats.costPerMile.toFixed(2) + '/mile');
@@ -70,9 +70,7 @@ export class Dashboard {
 
   readonly worstLegSubtitle = computed(() => this.stats.worstLeg.from + ' → ' + this.stats.worstLeg.to);
 
-  readonly formattedAvgDistanceBetweenStops = computed(() =>
-    this.stats.averageDistanceBetweenStops.toFixed(0) + ' mi',
-  );
+  readonly formattedAvgDistanceBetweenStops = computed(() => this.stats.averageDistanceBetweenStops.toFixed(0) + ' mi');
 
   readonly formattedLongestLeg = computed(() => this.stats.longestLeg.miles.toLocaleString('en-US') + ' mi');
 
@@ -82,29 +80,17 @@ export class Dashboard {
 
   readonly shortestLegSubtitle = computed(() => this.stats.shortestLeg.from + ' → ' + this.stats.shortestLeg.to);
 
-  readonly formattedFurthestPoint = computed(() =>
-    this.stats.furthestPointFromStart.distanceMiles.toFixed(0) + ' mi',
-  );
+  readonly formattedFurthestPoint = computed(() => this.stats.furthestPointFromStart.distanceMiles.toFixed(0) + ' mi');
 
-  readonly formattedHighElevation = computed(() =>
-    this.extremes.highPoint.elevation.toLocaleString('en-US') + ' ft',
-  );
+  readonly formattedHighElevation = computed(() => this.extremes.highPoint.elevation.toLocaleString('en-US') + ' ft');
 
-  readonly formattedLowElevation = computed(() =>
-    this.extremes.lowPoint.elevation.toLocaleString('en-US') + ' ft',
-  );
+  readonly formattedLowElevation = computed(() => this.extremes.lowPoint.elevation.toLocaleString('en-US') + ' ft');
 
-  readonly formattedElevationSpan = computed(() =>
-    this.extremes.elevationSpan.toLocaleString('en-US') + ' ft',
-  );
+  readonly formattedElevationSpan = computed(() => this.extremes.elevationSpan.toLocaleString('en-US') + ' ft');
 
-  readonly formattedNorthSouthSpan = computed(() =>
-    this.extremes.northSouthSpan.toFixed(0) + ' mi',
-  );
+  readonly formattedNorthSouthSpan = computed(() => this.extremes.northSouthSpan.toFixed(0) + ' mi');
 
-  readonly formattedEastWestSpan = computed(() =>
-    this.extremes.eastWestSpan.toFixed(0) + ' mi',
-  );
+  readonly formattedEastWestSpan = computed(() => this.extremes.eastWestSpan.toFixed(0) + ' mi');
 
   readonly stateRoute = computed(() => this.stateStats.map((s) => s.state).join(' → '));
 }

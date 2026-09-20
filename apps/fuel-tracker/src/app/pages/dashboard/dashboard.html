@@ -64,16 +64,8 @@
       [value]="formattedAvgDistanceBetweenStops()"
       subtitle="Average leg distance"
     />
-    <ft-stat-card
-      title="Longest Leg"
-      [value]="formattedLongestLeg()"
-      [subtitle]="longestLegSubtitle()"
-    />
-    <ft-stat-card
-      title="Shortest Leg"
-      [value]="formattedShortestLeg()"
-      [subtitle]="shortestLegSubtitle()"
-    />
+    <ft-stat-card title="Longest Leg" [value]="formattedLongestLeg()" [subtitle]="longestLegSubtitle()" />
+    <ft-stat-card title="Shortest Leg" [value]="formattedShortestLeg()" [subtitle]="shortestLegSubtitle()" />
     <ft-stat-card
       title="Furthest from Start"
       [value]="formattedFurthestPoint()"
@@ -101,7 +93,7 @@
               <span class="direction">E</span>
               <span class="location">{{ extremes.east.location }}</span>
               @if (extremes.east.note) {
-                <span class="note">{{ extremes.east.note }}</span>
+              <span class="note">{{ extremes.east.note }}</span>
               }
             </div>
             <div class="compass-point west">
@@ -168,14 +160,14 @@
           </thead>
           <tbody>
             @for (state of stateStats; track state.state) {
-              <tr>
-                <td>{{ state.state }}</td>
-                <td>{{ state.stops }}</td>
-                <td>{{ state.miles | number:'1.0-0' }}</td>
-                <td>{{ state.gallons | number:'1.1-1' }}</td>
-                <td>{{ state.cost | currency }}</td>
-                <td>{{ state.averagePrice | currency:'USD':'symbol':'1.3-3' }}</td>
-              </tr>
+            <tr>
+              <td>{{ state.state }}</td>
+              <td>{{ state.stops }}</td>
+              <td>{{ state.miles | number:'1.0-0' }}</td>
+              <td>{{ state.gallons | number:'1.1-1' }}</td>
+              <td>{{ state.cost | currency }}</td>
+              <td>{{ state.averagePrice | currency:'USD':'symbol':'1.3-3' }}</td>
+            </tr>
             }
           </tbody>
         </table>
@@ -202,9 +194,7 @@
           <strong>{{ metadata.tripBResetOdometer | number:'1.1-1' }}</strong>.
         </p>
         <p><strong>Location:</strong> {{ metadata.tripBResetLocation }} — the second Yellowstone fuel stop.</p>
-        <p class="actual-trip">
-          <strong>Actual Total Trip:</strong> {{ formattedActualTrip() }} miles
-        </p>
+        <p class="actual-trip"><strong>Actual Total Trip:</strong> {{ formattedActualTrip() }} miles</p>
       </div>
     </div>
   </section>

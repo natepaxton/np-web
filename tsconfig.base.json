@@ -10,39 +10,19 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strict": false,
     "paths": {
-      "@np-aspire/ui": [
-        "./libs/ui/src/index.ts"
-      ],
-      "@spartan-ng/helm/button": [
-        "./libs/helm/button/src/index.ts"
-      ],
-      "@spartan-ng/helm/utils": [
-        "./libs/helm/utils/src/index.ts"
-      ],
-      "@spartan-ng/helm/card": [
-        "./libs/helm/card/src/index.ts"
-      ],
-      "@spartan-ng/helm/input": [
-        "./libs/helm/input/src/index.ts"
-      ],
-      "@np-aspire/auth": [
-        "./libs/auth/src/index.ts"
-      ],
-      "@spartan-ng/helm/collapsible": [
-        "./libs/helm/collapsible/src/index.ts"
-      ]
+      "@np-aspire/ui": ["./libs/ui/src/index.ts"],
+      "@spartan-ng/helm/button": ["./libs/helm/button/src/index.ts"],
+      "@spartan-ng/helm/utils": ["./libs/helm/utils/src/index.ts"],
+      "@spartan-ng/helm/card": ["./libs/helm/card/src/index.ts"],
+      "@spartan-ng/helm/input": ["./libs/helm/input/src/index.ts"],
+      "@np-aspire/auth": ["./libs/auth/src/index.ts"],
+      "@spartan-ng/helm/collapsible": ["./libs/helm/collapsible/src/index.ts"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }
