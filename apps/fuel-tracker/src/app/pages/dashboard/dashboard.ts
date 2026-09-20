@@ -9,10 +9,10 @@ import {
   tripMetadata,
   calculateTripStats,
   calculateStateStats,
-  elevationData,
+  calculateJourneyExtremes,
   TripStats,
   StateStats,
-  ElevationData,
+  JourneyExtremes,
 } from '../../data/fuel-stops';
 
 @Component({
@@ -27,7 +27,7 @@ export class Dashboard {
   readonly metadata = tripMetadata;
   readonly stats: TripStats = calculateTripStats();
   readonly stateStats: StateStats[] = calculateStateStats();
-  readonly elevation: ElevationData = elevationData;
+  readonly extremes: JourneyExtremes = calculateJourneyExtremes();
 
   readonly highlightedStop = signal<number | null>(null);
 
@@ -87,15 +87,23 @@ export class Dashboard {
   );
 
   readonly formattedHighElevation = computed(() =>
-    this.elevation.highPoint.elevation.toLocaleString('en-US') + ' ft',
+    this.extremes.highPoint.elevation.toLocaleString('en-US') + ' ft',
   );
 
   readonly formattedLowElevation = computed(() =>
-    this.elevation.lowPoint.elevation.toLocaleString('en-US') + ' ft',
+    this.extremes.lowPoint.elevation.toLocaleString('en-US') + ' ft',
   );
 
-  readonly formattedElevationChange = computed(() =>
-    (this.elevation.highPoint.elevation - this.elevation.lowPoint.elevation).toLocaleString('en-US') + ' ft',
+  readonly formattedElevationSpan = computed(() =>
+    this.extremes.elevationSpan.toLocaleString('en-US') + ' ft',
+  );
+
+  readonly formattedNorthSouthSpan = computed(() =>
+    this.extremes.northSouthSpan.toFixed(0) + ' mi',
+  );
+
+  readonly formattedEastWestSpan = computed(() =>
+    this.extremes.eastWestSpan.toFixed(0) + ' mi',
   );
 
   readonly stateRoute = computed(() => this.stateStats.map((s) => s.state).join(' → '));

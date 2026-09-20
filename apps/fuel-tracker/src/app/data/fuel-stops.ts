@@ -178,26 +178,40 @@ export interface StateStats {
   averagePrice: number;
 }
 
-export interface ElevationData {
-  highPoint: { location: string; elevation: number; description: string };
-  lowPoint: { location: string; elevation: number; description: string };
+export interface CardinalPoint {
+  location: string;
+  lat: number;
+  lng: number;
+  note?: string;
 }
 
-export const elevationData: ElevationData = {
-  highPoint: {
-    location: 'Beartooth Pass, US-212',
-    elevation: 10947,
-    description: 'Highest point on US-212 in Shoshone National Forest',
-  },
-  lowPoint: {
-    location: 'St. Louis, MO',
-    elevation: 466,
-    description: 'Near the Mississippi River',
-  },
+export interface JourneyExtremes {
+  north: CardinalPoint;
+  south: CardinalPoint;
+  east: CardinalPoint;
+  west: CardinalPoint;
+  highPoint: { location: string; elevation: number };
+  lowPoint: { location: string; elevation: number };
+  northSouthSpan: number;
+  eastWestSpan: number;
+  elevationSpan: number;
+}
+
+// Cardinal extreme points of the journey
+const cardinalPoints = {
+  north: { location: 'Knife River National Park, Stanton, ND', lat: 47.3541, lng: -101.3863 },
+  south: { location: 'Mammoth Cave National Park, KY', lat: 37.187, lng: -86.1008 },
+  east: { location: 'South Charleston, WV', lat: 38.3684, lng: -81.6996, note: 'Origin & Destination' },
+  west: { location: 'West Yellowstone, MT', lat: 44.6621, lng: -111.1041 },
+};
+
+const elevationPoints = {
+  high: { location: 'Beartooth Pass, US-212', elevation: 10947 },
+  low: { location: 'St. Louis, MO', elevation: 466 },
 };
 
 // Calculate distance between two lat/lng points using Haversine formula (returns miles)
-function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+export function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 3959; // Earth's radius in miles
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
@@ -209,6 +223,34 @@ function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
       Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
+}
+
+export function calculateJourneyExtremes(): JourneyExtremes {
+  const northSouthSpan = haversineDistance(
+    cardinalPoints.north.lat,
+    cardinalPoints.north.lng,
+    cardinalPoints.south.lat,
+    cardinalPoints.south.lng,
+  );
+
+  const eastWestSpan = haversineDistance(
+    cardinalPoints.east.lat,
+    cardinalPoints.east.lng,
+    cardinalPoints.west.lat,
+    cardinalPoints.west.lng,
+  );
+
+  return {
+    north: cardinalPoints.north,
+    south: cardinalPoints.south,
+    east: cardinalPoints.east,
+    west: cardinalPoints.west,
+    highPoint: elevationPoints.high,
+    lowPoint: elevationPoints.low,
+    northSouthSpan,
+    eastWestSpan,
+    elevationSpan: elevationPoints.high.elevation - elevationPoints.low.elevation,
+  };
 }
 
 export function calculateTripStats(): TripStats {

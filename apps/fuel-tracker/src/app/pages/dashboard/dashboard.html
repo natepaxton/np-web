@@ -81,36 +81,79 @@
     />
   </section>
 
-  <!-- Elevation Section -->
-  <section class="stats-grid elevation-stats">
-    <ft-stat-card
-      icon="⛰️"
-      title="High Point"
-      [value]="formattedHighElevation()"
-      [subtitle]="elevation.highPoint.location"
-    />
-    <ft-stat-card
-      icon="🌊"
-      title="Low Point"
-      [value]="formattedLowElevation()"
-      [subtitle]="elevation.lowPoint.location"
-    />
-    <ft-stat-card
-      title="Elevation Change"
-      [value]="formattedElevationChange()"
-      subtitle="Total vertical range"
-    />
+  <!-- Journey Extremes Section -->
+  <section class="extremes-section">
+    <div class="section-card">
+      <h2>Journey Extremes</h2>
+      <div class="extremes-layout">
+        <!-- Compass Visualization -->
+        <div class="compass-container">
+          <div class="compass">
+            <div class="compass-point north">
+              <span class="direction">N</span>
+              <span class="location">{{ extremes.north.location }}</span>
+            </div>
+            <div class="compass-point south">
+              <span class="direction">S</span>
+              <span class="location">{{ extremes.south.location }}</span>
+            </div>
+            <div class="compass-point east">
+              <span class="direction">E</span>
+              <span class="location">{{ extremes.east.location }}</span>
+              @if (extremes.east.note) {
+                <span class="note">{{ extremes.east.note }}</span>
+              }
+            </div>
+            <div class="compass-point west">
+              <span class="direction">W</span>
+              <span class="location">{{ extremes.west.location }}</span>
+            </div>
+            <div class="compass-center">
+              <div class="span-label ns">{{ formattedNorthSouthSpan() }}</div>
+              <div class="span-label ew">{{ formattedEastWestSpan() }}</div>
+            </div>
+            <div class="compass-line vertical"></div>
+            <div class="compass-line horizontal"></div>
+          </div>
+        </div>
+
+        <!-- Elevation Stats -->
+        <div class="elevation-stats">
+          <div class="elevation-item high">
+            <span class="icon">⛰️</span>
+            <div class="details">
+              <span class="label">Highest Point</span>
+              <span class="value">{{ formattedHighElevation() }}</span>
+              <span class="location">{{ extremes.highPoint.location }}</span>
+            </div>
+          </div>
+          <div class="elevation-bar">
+            <div class="bar-fill"></div>
+            <span class="span-value">{{ formattedElevationSpan() }} elevation span</span>
+          </div>
+          <div class="elevation-item low">
+            <span class="icon">🌊</span>
+            <div class="details">
+              <span class="label">Lowest Point</span>
+              <span class="value">{{ formattedLowElevation() }}</span>
+              <span class="location">{{ extremes.lowPoint.location }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- State Route Section -->
   <section class="route-section">
     <div hlmCollapsible class="section-card">
       <h2>Route Through States</h2>
-      <p class="state-route">{{ stateRoute() }}</p>
-      <button hlmCollapsibleTrigger class="expand-trigger">
-        <span class="trigger-text">View state-by-state breakdown</span>
-        <span class="trigger-icon">▼</span>
-      </button>
+      <div class="state-route-row">
+        <p class="state-route">{{ stateRoute() }}</p>
+        <button hlmCollapsibleTrigger class="expand-trigger" aria-label="Toggle state details">
+          <span class="trigger-icon">▼</span>
+        </button>
+      </div>
       <div hlmCollapsibleContent class="state-table-wrapper">
         <table class="state-table">
           <thead>
