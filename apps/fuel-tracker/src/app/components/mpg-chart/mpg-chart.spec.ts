@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component } from '@angular/core';
+import { Component, viewChild } from '@angular/core';
 import { MpgChart } from './mpg-chart';
 import { FuelStop } from '../../data/fuel-stops';
 
@@ -45,10 +45,12 @@ const mockStops: FuelStop[] = [
 class TestHost {
   stops = mockStops;
   averageMpg = 12.5;
+  chart = viewChild(MpgChart);
 }
 
 describe('MpgChart', () => {
   let fixture: ComponentFixture<TestHost>;
+  let host: TestHost;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -56,6 +58,7 @@ describe('MpgChart', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestHost);
+    host = fixture.componentInstance;
     fixture.detectChanges();
   });
 
@@ -67,5 +70,22 @@ describe('MpgChart', () => {
   it('should contain a canvas element', () => {
     const canvas = fixture.nativeElement.querySelector('canvas');
     expect(canvas).toBeTruthy();
+  });
+
+  describe('formatTooltipLabel', () => {
+    it('should format a valid MPG value', () => {
+      const chart = host.chart();
+      expect(chart?.formatTooltipLabel(12.567)).toBe('12.6 MPG');
+    });
+
+    it('should return empty string for null value', () => {
+      const chart = host.chart();
+      expect(chart?.formatTooltipLabel(null)).toBe('');
+    });
+
+    it('should handle zero value', () => {
+      const chart = host.chart();
+      expect(chart?.formatTooltipLabel(0)).toBe('0.0 MPG');
+    });
   });
 });

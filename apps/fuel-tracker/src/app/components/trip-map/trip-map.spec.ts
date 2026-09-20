@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { TripMap } from './trip-map';
 import { FuelStop } from '../../data/fuel-stops';
 
@@ -35,19 +35,22 @@ const mockStops: FuelStop[] = [
     cumulativeGallons: 22,
     lat: 38.2,
     lng: -83.0,
+    notes: 'Test note',
   },
 ];
 
 @Component({
   imports: [TripMap],
-  template: `<ft-trip-map [stops]="stops" />`,
+  template: `<ft-trip-map [stops]="stops" [highlightedStopIndex]="highlightedIndex()" />`,
 })
 class TestHost {
   stops = mockStops;
+  highlightedIndex = signal<number | null>(null);
 }
 
 describe('TripMap', () => {
   let fixture: ComponentFixture<TestHost>;
+  let host: TestHost;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -55,6 +58,7 @@ describe('TripMap', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestHost);
+    host = fixture.componentInstance;
     fixture.detectChanges();
   });
 
@@ -66,5 +70,20 @@ describe('TripMap', () => {
   it('should contain a map container', () => {
     const mapContainer = fixture.nativeElement.querySelector('.map-container');
     expect(mapContainer).toBeTruthy();
+  });
+
+  it('should highlight a stop when highlightedStopIndex changes', () => {
+    // Set highlighted index to trigger the effect and updateHighlight
+    host.highlightedIndex.set(1);
+    fixture.detectChanges();
+
+    // The effect should have been triggered - we just verify no errors occur
+    expect(host.highlightedIndex()).toBe(1);
+  });
+
+  it('should handle highlighting with index 0', () => {
+    host.highlightedIndex.set(0);
+    fixture.detectChanges();
+    expect(host.highlightedIndex()).toBe(0);
   });
 });

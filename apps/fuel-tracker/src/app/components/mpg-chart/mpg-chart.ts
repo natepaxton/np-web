@@ -35,6 +35,10 @@ export class MpgChart implements AfterViewInit, OnDestroy {
     this.chart?.destroy();
   }
 
+  formatTooltipLabel(value: number | null): string {
+    return value !== null ? `${value.toFixed(1)} MPG` : '';
+  }
+
   private createChart(): void {
     const stops = this.stops();
     const stopsWithMpg = stops.filter((s) => s.mpg !== null);
@@ -67,10 +71,7 @@ export class MpgChart implements AfterViewInit, OnDestroy {
           },
           tooltip: {
             callbacks: {
-              label: (context) => {
-                const value = context.parsed.y;
-                return value !== null ? `${value.toFixed(1)} MPG` : '';
-              },
+              label: (context) => this.formatTooltipLabel(context.parsed.y),
             },
           },
         },
