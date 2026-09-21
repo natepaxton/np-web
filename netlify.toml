@@ -1,0 +1,6 @@
+[build]
+  command = "sed -i \"s/__STADIA_API_KEY_PLACEHOLDER__/$STADIA_API_KEY/g\" apps/yellowstone/src/environments/environment.prod.ts && npx nx build yellowstone"
+  publish = "dist/apps/yellowstone/browser"
+
+[build.environment]
+  NODE_VERSION = "22"

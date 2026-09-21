@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  stadiaApiKey: 'ed1df59c-264b-4843-be08-b47ac2ef4b9a',
+  // Injected at build time via sed in netlify.toml
+  stadiaApiKey: '__STADIA_API_KEY_PLACEHOLDER__',
 };
