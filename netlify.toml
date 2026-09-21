@@ -4,3 +4,5 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  # Exclude the environment file from secret scanning since we inject the API key at build time
+  SECRETS_SCAN_OMIT_PATHS = "apps/yellowstone/src/environments/environment.prod.ts"
