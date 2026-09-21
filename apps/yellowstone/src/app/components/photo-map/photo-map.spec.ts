@@ -329,10 +329,11 @@ describe('PhotoMapComponent tile URL', () => {
     // This test verifies the ternary logic by checking the URL construction
     const baseUrl = 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png';
     const apiKey = 'test-api-key';
+    const emptyKey = '';
 
     // Simulate what the component does
     const tileUrlWithKey = apiKey ? `${baseUrl}?api_key=${apiKey}` : baseUrl;
-    const tileUrlWithoutKey = '' ? `${baseUrl}?api_key=${''}` : baseUrl;
+    const tileUrlWithoutKey = emptyKey ? `${baseUrl}?api_key=${emptyKey}` : baseUrl;
 
     expect(tileUrlWithKey).toBe(`${baseUrl}?api_key=${apiKey}`);
     expect(tileUrlWithoutKey).toBe(baseUrl);
