@@ -12,6 +12,7 @@ import {
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import { Photo } from '../../data/photos';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'ys-photo-map',
@@ -62,7 +63,11 @@ export class PhotoMapComponent implements AfterViewInit, OnDestroy {
     });
 
     // Add tile layer (using Stadia Maps dark theme)
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+    const tileUrl = environment.stadiaApiKey
+      ? `https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=${environment.stadiaApiKey}`
+      : 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png';
+
+    L.tileLayer(tileUrl, {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://stadiamaps.com/">Stadia Maps</a>',
       maxZoom: 20,
