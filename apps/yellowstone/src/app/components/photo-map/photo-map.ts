@@ -75,12 +75,15 @@ export class PhotoMapComponent implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     // Initialize marker cluster group
-    this.markerClusterGroup = L.markerClusterGroup({
+    // leaflet.markercluster augments L at runtime - access via window.L for production builds
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const createMarkerClusterGroup = (L as any).markerClusterGroup || (window as any).L?.markerClusterGroup;
+    this.markerClusterGroup = createMarkerClusterGroup({
       chunkedLoading: true,
       maxClusterRadius: 50,
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: false,
-      iconCreateFunction: (cluster) => {
+      iconCreateFunction: (cluster: L.MarkerCluster) => {
         const count = cluster.getChildCount();
         let size = 'small';
         if (count >= 100) {
@@ -96,7 +99,7 @@ export class PhotoMapComponent implements AfterViewInit, OnDestroy {
       },
     });
 
-    this.map.addLayer(this.markerClusterGroup);
+    this.map.addLayer(this.markerClusterGroup!);
   }
 
   private updateMarkers(photos: Photo[]): void {
