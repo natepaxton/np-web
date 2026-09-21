@@ -77,6 +77,7 @@ export class PhotoMapComponent implements AfterViewInit, OnDestroy {
     // Initialize marker cluster group
     // leaflet.markercluster augments L at runtime - access via window.L for production builds
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // istanbul ignore next: fallback for production bundle where L may not be augmented
     const createMarkerClusterGroup = (L as any).markerClusterGroup || (window as any).L?.markerClusterGroup;
     this.markerClusterGroup = createMarkerClusterGroup({
       chunkedLoading: true,
