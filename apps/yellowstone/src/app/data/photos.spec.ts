@@ -73,6 +73,24 @@ const mockPhotos: Photo[] = [
     medium: 'https://example.com/medium4.jpg',
     full: 'https://example.com/full4.jpg',
   },
+  {
+    id: 'test-5',
+    filename: 'test-photo-5.jpg',
+    cameraOwner: 'Nate',
+    lat: 44.49,
+    lng: -110.86,
+    dateTaken: null,
+    dateCategory: 'unknown',
+    people: [],
+    geothermals: [],
+    wildlife: [],
+    vehicles: [],
+    npsSites: [],
+    attractions: [],
+    thumbnail: 'https://example.com/thumb5.jpg',
+    medium: 'https://example.com/medium5.jpg',
+    full: 'https://example.com/full5.jpg',
+  },
 ];
 
 describe('photos utilities', () => {
@@ -91,6 +109,12 @@ describe('photos utilities', () => {
       expect(dates[0]).toBe('2026-08-29');
       expect(dates[dates.length - 1]).toBe('2026-09-06');
     });
+
+    it('should skip photos without dateTaken', () => {
+      const dates = getUniqueDates(mockPhotos);
+      // test-5 has null dateTaken, so we should have 4 dates, not 5
+      expect(dates).toHaveLength(4);
+    });
   });
 
   describe('getYellowstoneDates', () => {
@@ -106,6 +130,12 @@ describe('photos utilities', () => {
       expect(dates).not.toContain('2026-08-29');
       expect(dates).not.toContain('2026-09-06');
     });
+
+    it('should include boundary dates', () => {
+      const dates = getYellowstoneDates(mockPhotos, '2026-09-01', '2026-09-02');
+      expect(dates).toContain('2026-09-01');
+      expect(dates).toContain('2026-09-02');
+    });
   });
 
   describe('formatDateForDisplay', () => {
@@ -113,6 +143,12 @@ describe('photos utilities', () => {
       const formatted = formatDateForDisplay('2026-09-01');
       // The format includes weekday, month, and day
       expect(formatted).toMatch(/\w{3}, \w{3} \d{1,2}/);
+    });
+
+    it('should format different dates correctly', () => {
+      const formatted = formatDateForDisplay('2026-08-30');
+      // Date parsing can differ by timezone, so just check it contains Aug
+      expect(formatted).toContain('Aug');
     });
   });
 
@@ -168,6 +204,15 @@ describe('photos utilities', () => {
       expect(filtered.every((p) => p.people.includes('Laura'))).toBe(true);
     });
 
+    it('should exclude photos when person filter does not match', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        people: new Set(['NonExistent']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered).toHaveLength(0);
+    });
+
     it('should filter by camera owner when cameraOwners filter is set', () => {
       const filters: PhotoFilters = {
         ...defaultFilters,
@@ -196,6 +241,35 @@ describe('photos utilities', () => {
       expect(filtered.every((p) => p.wildlife.includes('elk'))).toBe(true);
     });
 
+    it('should filter by vehicle type when vehicles filter is set', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        includeTripOut: true,
+        vehicles: new Set(['camper']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered.every((p) => p.vehicles.includes('camper'))).toBe(true);
+    });
+
+    it('should filter by NPS site when npsSites filter is set', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        npsSites: new Set(['yellowstone']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered.every((p) => p.npsSites.includes('yellowstone'))).toBe(true);
+    });
+
+    it('should filter by attraction when attractions filter is set', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        includeTripBack: true,
+        attractions: new Set(['wall-drug']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered.every((p) => p.attractions.includes('wall-drug'))).toBe(true);
+    });
+
     it('should filter by specific date when date is selected', () => {
       const filters: PhotoFilters = {
         ...defaultFilters,
@@ -212,6 +286,43 @@ describe('photos utilities', () => {
       };
       const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
       expect(filtered).toHaveLength(0);
+    });
+
+    it('should exclude photos with unknown dateCategory when all-days is selected', () => {
+      const filtered = filterPhotos(mockPhotos, defaultFilters, '2026-08-30', '2026-09-05');
+      expect(filtered.every((p) => p.dateCategory !== 'unknown')).toBe(true);
+    });
+
+    it('should exclude photos without dateTaken when specific date is selected', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        dates: new Set(['2026-09-01']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      // test-5 has no dateTaken, should be excluded
+      expect(filtered.every((p) => p.dateTaken !== null)).toBe(true);
+    });
+
+    it('should support multiple date selections', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        dates: new Set(['2026-09-01', '2026-09-02']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered.length).toBeGreaterThan(0);
+      expect(
+        filtered.every((p) => p.dateTaken?.startsWith('2026-09-01') || p.dateTaken?.startsWith('2026-09-02')),
+      ).toBe(true);
+    });
+
+    it('should combine multiple filters (AND logic)', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        people: new Set(['Laura']),
+        geothermals: new Set(['geyser']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered.every((p) => p.people.includes('Laura') && p.geothermals.includes('geyser'))).toBe(true);
     });
   });
 });
