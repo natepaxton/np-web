@@ -113,9 +113,7 @@ describe('PhotoFiltersComponent', () => {
   });
 
   it('should emit filtersChange when toggling a person', () => {
-    const personChips = fixture.nativeElement.querySelectorAll(
-      '.filter-section:nth-child(2) .filter-chip',
-    );
+    const personChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(2) .filter-chip');
     personChips[0].click();
     fixture.detectChanges();
 
@@ -132,9 +130,7 @@ describe('PhotoFiltersComponent', () => {
     fixture.detectChanges();
 
     // Click on Nate to deselect
-    const personChips = fixture.nativeElement.querySelectorAll(
-      '.filter-section:nth-child(2) .filter-chip',
-    );
+    const personChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(2) .filter-chip');
     personChips[0].click();
     fixture.detectChanges();
 
@@ -199,9 +195,7 @@ describe('PhotoFiltersComponent', () => {
     });
 
     it('should toggle trip out checkbox', () => {
-      const tripOutCheckbox = fixture.nativeElement.querySelector(
-        '.trip-toggles input[type="checkbox"]',
-      );
+      const tripOutCheckbox = fixture.nativeElement.querySelector('.trip-toggles input[type="checkbox"]');
       tripOutCheckbox.click();
       fixture.detectChanges();
 
@@ -223,9 +217,7 @@ describe('PhotoFiltersComponent', () => {
       });
       fixture.detectChanges();
 
-      const tripOutCheckbox = fixture.nativeElement.querySelector(
-        '.trip-toggles input[type="checkbox"]',
-      );
+      const tripOutCheckbox = fixture.nativeElement.querySelector('.trip-toggles input[type="checkbox"]');
       tripOutCheckbox.click();
       fixture.detectChanges();
 
@@ -252,9 +244,7 @@ describe('PhotoFiltersComponent', () => {
 
   describe('camera owner filtering', () => {
     it('should toggle camera owner on', () => {
-      const cameraChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(3) .filter-chip',
-      );
+      const cameraChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(3) .filter-chip');
       cameraChips[0].click();
       fixture.detectChanges();
 
@@ -268,9 +258,7 @@ describe('PhotoFiltersComponent', () => {
       });
       fixture.detectChanges();
 
-      const cameraChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(3) .filter-chip',
-      );
+      const cameraChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(3) .filter-chip');
       cameraChips[0].click();
       fixture.detectChanges();
 
@@ -294,9 +282,7 @@ describe('PhotoFiltersComponent', () => {
 
   describe('geothermal filtering', () => {
     it('should toggle geothermal type on', () => {
-      const geoChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(4) .filter-chip',
-      );
+      const geoChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(4) .filter-chip');
       geoChips[0].click();
       fixture.detectChanges();
 
@@ -310,9 +296,7 @@ describe('PhotoFiltersComponent', () => {
       });
       fixture.detectChanges();
 
-      const geoChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(4) .filter-chip',
-      );
+      const geoChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(4) .filter-chip');
       geoChips[0].click();
       fixture.detectChanges();
 
@@ -336,9 +320,7 @@ describe('PhotoFiltersComponent', () => {
 
   describe('wildlife filtering', () => {
     it('should toggle wildlife type on', () => {
-      const wildlifeChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(5) .filter-chip',
-      );
+      const wildlifeChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(5) .filter-chip');
       wildlifeChips[0].click();
       fixture.detectChanges();
 
@@ -352,9 +334,7 @@ describe('PhotoFiltersComponent', () => {
       });
       fixture.detectChanges();
 
-      const wildlifeChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(5) .filter-chip',
-      );
+      const wildlifeChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(5) .filter-chip');
       wildlifeChips[0].click();
       fixture.detectChanges();
 
@@ -378,9 +358,7 @@ describe('PhotoFiltersComponent', () => {
 
   describe('vehicle filtering', () => {
     it('should toggle vehicle type on', () => {
-      const vehicleChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(6) .filter-chip',
-      );
+      const vehicleChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(6) .filter-chip');
       vehicleChips[0].click();
       fixture.detectChanges();
 
@@ -394,9 +372,7 @@ describe('PhotoFiltersComponent', () => {
       });
       fixture.detectChanges();
 
-      const vehicleChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(6) .filter-chip',
-      );
+      const vehicleChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(6) .filter-chip');
       vehicleChips[0].click();
       fixture.detectChanges();
 
@@ -420,9 +396,7 @@ describe('PhotoFiltersComponent', () => {
 
   describe('NPS site filtering', () => {
     it('should toggle NPS site on', () => {
-      const npsChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(7) .filter-chip',
-      );
+      const npsChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(7) .filter-chip');
       npsChips[0].click();
       fixture.detectChanges();
 
@@ -436,9 +410,7 @@ describe('PhotoFiltersComponent', () => {
       });
       fixture.detectChanges();
 
-      const npsChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(7) .filter-chip',
-      );
+      const npsChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(7) .filter-chip');
       npsChips[0].click();
       fixture.detectChanges();
 
@@ -462,9 +434,7 @@ describe('PhotoFiltersComponent', () => {
 
   describe('attraction filtering', () => {
     it('should toggle attraction on', () => {
-      const attractionChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(8) .filter-chip',
-      );
+      const attractionChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(8) .filter-chip');
       attractionChips[0].click();
       fixture.detectChanges();
 
@@ -478,9 +448,7 @@ describe('PhotoFiltersComponent', () => {
       });
       fixture.detectChanges();
 
-      const attractionChips = fixture.nativeElement.querySelectorAll(
-        '.filter-section:nth-child(8) .filter-chip',
-      );
+      const attractionChips = fixture.nativeElement.querySelectorAll('.filter-section:nth-child(8) .filter-chip');
       attractionChips[0].click();
       fixture.detectChanges();
 

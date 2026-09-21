@@ -192,9 +192,7 @@ describe('PhotoMapComponent', () => {
   it('should filter out photos without GPS coordinates', () => {
     const L = require('leaflet');
     const markerCalls = L.marker.mock.calls;
-    const hasNullCoords = markerCalls.some(
-      (call: number[][]) => call[0][0] === null || call[0][1] === null,
-    );
+    const hasNullCoords = markerCalls.some((call: number[][]) => call[0][0] === null || call[0][1] === null);
     expect(hasNullCoords).toBe(false);
   });
 
