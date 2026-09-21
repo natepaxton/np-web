@@ -222,6 +222,15 @@ describe('photos utilities', () => {
       expect(filtered.every((p) => p.cameraOwner === 'Laura')).toBe(true);
     });
 
+    it('should exclude photos when camera owner does not match', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        cameraOwners: new Set(['NonExistentOwner']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered).toHaveLength(0);
+    });
+
     it('should filter by geothermal type when geothermals filter is set', () => {
       const filters: PhotoFilters = {
         ...defaultFilters,
@@ -229,6 +238,15 @@ describe('photos utilities', () => {
       };
       const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
       expect(filtered.every((p) => p.geothermals.includes('geyser'))).toBe(true);
+    });
+
+    it('should exclude photos when geothermal does not match', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        geothermals: new Set(['nonexistent-geothermal']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered).toHaveLength(0);
     });
 
     it('should filter by wildlife type when wildlife filter is set', () => {
@@ -258,6 +276,15 @@ describe('photos utilities', () => {
       };
       const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
       expect(filtered.every((p) => p.npsSites.includes('yellowstone'))).toBe(true);
+    });
+
+    it('should exclude photos when NPS site does not match', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        npsSites: new Set(['nonexistent-park']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered).toHaveLength(0);
     });
 
     it('should filter by attraction when attractions filter is set', () => {
@@ -323,6 +350,99 @@ describe('photos utilities', () => {
       };
       const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
       expect(filtered.every((p) => p.people.includes('Laura') && p.geothermals.includes('geyser'))).toBe(true);
+    });
+
+    it('should exclude photos when wildlife does not match', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        wildlife: new Set(['nonexistent-animal']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered).toHaveLength(0);
+    });
+
+    it('should exclude photos when vehicle does not match', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        vehicles: new Set(['nonexistent-vehicle']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered).toHaveLength(0);
+    });
+
+    it('should exclude photos when attraction does not match', () => {
+      const filters: PhotoFilters = {
+        ...defaultFilters,
+        attractions: new Set(['nonexistent-attraction']),
+      };
+      const filtered = filterPhotos(mockPhotos, filters, '2026-08-30', '2026-09-05');
+      expect(filtered).toHaveLength(0);
+    });
+
+    describe('handling photos with undefined optional arrays', () => {
+      const photoWithUndefinedArrays: Photo = {
+        id: 'undefined-arrays',
+        filename: 'undefined-arrays.jpg',
+        cameraOwner: 'Nate',
+        lat: 44.5,
+        lng: -110.5,
+        dateTaken: '2026-09-01T10:30:00.000Z',
+        dateCategory: 'yellowstone',
+        people: [],
+        geothermals: undefined as unknown as string[],
+        wildlife: undefined as unknown as string[],
+        vehicles: undefined as unknown as string[],
+        npsSites: undefined as unknown as string[],
+        attractions: undefined as unknown as string[],
+        thumbnail: 'https://example.com/thumb.jpg',
+        medium: 'https://example.com/medium.jpg',
+        full: 'https://example.com/full.jpg',
+      };
+
+      it('should handle undefined geothermals array with geothermal filter', () => {
+        const filters: PhotoFilters = {
+          ...defaultFilters,
+          geothermals: new Set(['geyser']),
+        };
+        const filtered = filterPhotos([photoWithUndefinedArrays], filters, '2026-08-30', '2026-09-05');
+        expect(filtered).toHaveLength(0);
+      });
+
+      it('should handle undefined wildlife array with wildlife filter', () => {
+        const filters: PhotoFilters = {
+          ...defaultFilters,
+          wildlife: new Set(['bison']),
+        };
+        const filtered = filterPhotos([photoWithUndefinedArrays], filters, '2026-08-30', '2026-09-05');
+        expect(filtered).toHaveLength(0);
+      });
+
+      it('should handle undefined vehicles array with vehicle filter', () => {
+        const filters: PhotoFilters = {
+          ...defaultFilters,
+          vehicles: new Set(['camper']),
+        };
+        const filtered = filterPhotos([photoWithUndefinedArrays], filters, '2026-08-30', '2026-09-05');
+        expect(filtered).toHaveLength(0);
+      });
+
+      it('should handle undefined npsSites array with npsSites filter', () => {
+        const filters: PhotoFilters = {
+          ...defaultFilters,
+          npsSites: new Set(['yellowstone']),
+        };
+        const filtered = filterPhotos([photoWithUndefinedArrays], filters, '2026-08-30', '2026-09-05');
+        expect(filtered).toHaveLength(0);
+      });
+
+      it('should handle undefined attractions array with attractions filter', () => {
+        const filters: PhotoFilters = {
+          ...defaultFilters,
+          attractions: new Set(['wall-drug']),
+        };
+        const filtered = filterPhotos([photoWithUndefinedArrays], filters, '2026-08-30', '2026-09-05');
+        expect(filtered).toHaveLength(0);
+      });
     });
   });
 });

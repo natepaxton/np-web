@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component, signal } from '@angular/core';
+import { Component, signal, DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { PhotoFiltersComponent } from './photo-filters';
 import { PhotoFilters } from '../../data/photos';
 
@@ -36,6 +37,7 @@ class TestHost {
 describe('PhotoFiltersComponent', () => {
   let fixture: ComponentFixture<TestHost>;
   let host: TestHost;
+  let filtersDebugEl: DebugElement;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -45,6 +47,7 @@ describe('PhotoFiltersComponent', () => {
     fixture = TestBed.createComponent(TestHost);
     host = fixture.componentInstance;
     fixture.detectChanges();
+    filtersDebugEl = fixture.debugElement.query(By.directive(PhotoFiltersComponent));
   });
 
   it('should create', () => {
@@ -238,6 +241,43 @@ describe('PhotoFiltersComponent', () => {
       fixture.detectChanges();
 
       // Should not have emitted a change
+      expect(host.lastFiltersChange).toBeNull();
+    });
+
+    it('should early return from toggleTripOut when all-days is not selected (direct method call)', () => {
+      // Set dates to something other than all-days
+      host.filters.set({
+        ...host.filters(),
+        dates: new Set(['2026-08-30']),
+      });
+      fixture.detectChanges();
+
+      // Get the component instance and call the method directly
+      const component = filtersDebugEl.componentInstance as PhotoFiltersComponent;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (component as any).toggleTripOut();
+      fixture.detectChanges();
+
+      // Should not have emitted a change because of early return
+      expect(host.lastFiltersChange).toBeNull();
+    });
+
+    it('should early return from toggleTripBack when all-days is not selected (direct method call)', () => {
+      // Set dates to something other than all-days
+      host.filters.set({
+        ...host.filters(),
+        dates: new Set(['2026-08-30']),
+      });
+      fixture.detectChanges();
+      host.lastFiltersChange = null;
+
+      // Get the component instance and call the method directly
+      const component = filtersDebugEl.componentInstance as PhotoFiltersComponent;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (component as any).toggleTripBack();
+      fixture.detectChanges();
+
+      // Should not have emitted a change because of early return
       expect(host.lastFiltersChange).toBeNull();
     });
   });

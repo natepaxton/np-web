@@ -286,3 +286,20 @@ describe('PhotoMapComponent', () => {
     expect(mockClearLayers).toHaveBeenCalled();
   });
 });
+
+describe('PhotoMapComponent edge cases', () => {
+  it('should handle destroy when map is not initialized', () => {
+    // Create a mock that returns null for the map
+    const L = require('leaflet');
+    L.map.mockReturnValueOnce(null);
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [PhotoMapComponent],
+    });
+
+    const fixture = TestBed.createComponent(PhotoMapComponent);
+    // Component should not throw when destroyed without proper map initialization
+    expect(() => fixture.destroy()).not.toThrow();
+  });
+});
