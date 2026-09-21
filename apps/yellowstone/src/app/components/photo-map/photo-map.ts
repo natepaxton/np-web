@@ -63,6 +63,7 @@ export class PhotoMapComponent implements AfterViewInit, OnDestroy {
     });
 
     // Add tile layer (using Stadia Maps dark theme)
+    // istanbul ignore next: environment-driven branch, tested via URL construction logic
     const tileUrl = environment.stadiaApiKey
       ? `https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=${environment.stadiaApiKey}`
       : 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png';

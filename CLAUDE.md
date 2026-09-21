@@ -66,5 +66,6 @@ Run all CI checks locally before creating a pull request to catch issues early:
 2. **Lint**: `npx nx run-many -t lint` (or `npx nx affected -t lint` for changed projects)
 3. **Test with coverage**: `npx nx run-many -t test --configuration=ci`
 4. **Build**: `npx nx run-many -t build` (or `npx nx affected -t build` for changed projects)
+5. **E2E**: `npx nx e2e <app>-e2e` (e.g., `npx nx e2e sandbox-e2e`)
 
 If tests fail or coverage thresholds are not met, add or update tests. Aim for 100% coverage on new code — the `codecov/patch` check requires 80% on changed lines, but higher coverage catches more bugs and makes the codebase more maintainable.
