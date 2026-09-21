@@ -64,6 +64,13 @@
       button.secondary:hover {
         background: rgba(255, 255, 255, 0.2);
       }
+      button.danger {
+        background: #ef4444;
+        color: #fff;
+      }
+      button.danger:hover {
+        background: #dc2626;
+      }
 
       .main-content {
         display: grid;
@@ -245,6 +252,21 @@
             ></span>
             <button class="secondary" onclick="exportJson()">Export JSON</button>
             <button class="secondary" onclick="copyJson()">Copy to Clipboard</button>
+            <span style="border-left: 1px solid rgba(255, 255, 255, 0.2); margin: 0 0.25rem"></span>
+            <button
+              class="secondary"
+              onclick="exportDeletedPhotos()"
+              title="Export list of deleted photos for Cloudinary cleanup"
+            >
+              Export Deleted <span id="deletedCount" style="color: #ef4444"></span>
+            </button>
+            <button
+              class="secondary"
+              onclick="clearDeletedPhotos()"
+              title="Clear deleted photos list after running cleanup script"
+            >
+              Clear Deleted
+            </button>
           </div>
         </header>
 
@@ -311,10 +333,14 @@
               <button onclick="nextPhoto()">Next →</button>
             </div>
 
+            <div style="margin-top: 0.75rem">
+              <button class="danger" onclick="deleteCurrentPhoto()" style="width: 100%">🗑️ Delete Photo (Del)</button>
+            </div>
+
             <div class="stats" id="stats"></div>
 
             <div class="keyboard-hints">
-              <kbd>←</kbd> <kbd>→</kbd> Navigate<br />
+              <kbd>←</kbd> <kbd>→</kbd> Navigate &nbsp; <kbd>Del</kbd> Delete photo<br />
               <kbd>1-7</kbd> People<br />
               <kbd>V</kbd> Camper <kbd>B</kbd> Subaru<br />
               <kbd>Shift+1-5</kbd> Geothermal<br />
@@ -374,10 +400,12 @@
       ];
 
       const STORAGE_KEY = 'yellowstone-photo-tagger';
+      const DELETED_STORAGE_KEY = 'yellowstone-deleted-photos';
       let photoData = null;
       let filteredPhotos = [];
       let currentIndex = 0;
       let autoSaveTimeout = null;
+      let deletedPhotos = []; // Track deleted photos for Cloudinary cleanup
 
       // Check for saved session on page load
       document.addEventListener('DOMContentLoaded', () => {
@@ -398,6 +426,8 @@
             document.getElementById('mainApp').style.display = 'block';
 
             initTagButtons();
+            loadDeletedPhotos();
+            updateDeletedCount();
 
             // Restore filter settings
             if (saved.filters) {
@@ -496,6 +526,8 @@
             document.getElementById('mainApp').style.display = 'block';
 
             initTagButtons();
+            loadDeletedPhotos();
+            updateDeletedCount();
             applyFilters();
           } catch (err) {
             alert('Error parsing JSON: ' + err.message);
@@ -684,6 +716,148 @@
           .catch((err) => alert('Failed to copy: ' + err));
       }
 
+      function deleteCurrentPhoto() {
+        if (filteredPhotos.length === 0) return;
+
+        const photo = filteredPhotos[currentIndex];
+        const confirmMsg = `Delete "${photo.filename}"?\n\nThis will:\n• Remove it from the JSON\n• Add it to the deletion queue for Cloudinary\n\nThis cannot be undone.`;
+
+        if (!confirm(confirmMsg)) return;
+
+        // Extract Cloudinary public ID from the full URL
+        // URL format: https://res.cloudinary.com/fdacst4d/image/upload/[transforms]/yellowstone/owner/filename
+        const publicId = extractPublicId(photo);
+        if (publicId) {
+          deletedPhotos.push({
+            id: photo.id,
+            publicId: publicId,
+            filename: photo.filename,
+            cameraOwner: photo.cameraOwner,
+            deletedAt: new Date().toISOString(),
+          });
+          saveDeletedPhotos();
+        }
+
+        // Remove from photoData.photos
+        const mainIndex = photoData.photos.findIndex((p) => p.id === photo.id);
+        if (mainIndex !== -1) {
+          photoData.photos.splice(mainIndex, 1);
+        }
+
+        // Remove from filtered list
+        filteredPhotos.splice(currentIndex, 1);
+
+        // Adjust current index if needed
+        if (currentIndex >= filteredPhotos.length) {
+          currentIndex = Math.max(0, filteredPhotos.length - 1);
+        }
+
+        showPhoto();
+        updateStats();
+        updateDeletedCount();
+        autoSave();
+
+        updateSaveStatus(`Deleted ${photo.filename}`);
+      }
+
+      function extractPublicId(photo) {
+        // The full URL is like: https://res.cloudinary.com/fdacst4d/image/upload/q_auto/yellowstone/laura/FILENAME
+        // We need: yellowstone/laura/FILENAME (without extension)
+        if (!photo.full) return null;
+
+        try {
+          const url = new URL(photo.full);
+          const pathParts = url.pathname.split('/');
+          // Find 'yellowstone' in the path and take everything after 'upload' and transforms
+          const uploadIdx = pathParts.indexOf('upload');
+          if (uploadIdx === -1) return null;
+
+          // Skip 'upload' and any transforms (which contain commas or known prefixes)
+          let startIdx = uploadIdx + 1;
+          while (startIdx < pathParts.length) {
+            const part = pathParts[startIdx];
+            // Transform segments typically have commas or start with known prefixes
+            if (
+              part.includes(',') ||
+              part.startsWith('c_') ||
+              part.startsWith('w_') ||
+              part.startsWith('h_') ||
+              part.startsWith('q_')
+            ) {
+              startIdx++;
+            } else {
+              break;
+            }
+          }
+
+          // Join the remaining parts (yellowstone/owner/filename)
+          return pathParts.slice(startIdx).join('/');
+        } catch (e) {
+          console.error('Failed to extract public ID:', e);
+          return null;
+        }
+      }
+
+      function saveDeletedPhotos() {
+        try {
+          localStorage.setItem(DELETED_STORAGE_KEY, JSON.stringify(deletedPhotos));
+        } catch (err) {
+          console.error('Failed to save deleted photos:', err);
+        }
+      }
+
+      function loadDeletedPhotos() {
+        try {
+          const saved = localStorage.getItem(DELETED_STORAGE_KEY);
+          if (saved) {
+            deletedPhotos = JSON.parse(saved);
+          }
+        } catch (err) {
+          console.error('Failed to load deleted photos:', err);
+          deletedPhotos = [];
+        }
+      }
+
+      function exportDeletedPhotos() {
+        if (deletedPhotos.length === 0) {
+          alert('No photos have been deleted.');
+          return;
+        }
+
+        const blob = new Blob([JSON.stringify(deletedPhotos, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'deleted-photos.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function clearDeletedPhotos() {
+        if (deletedPhotos.length === 0) {
+          alert('No deleted photos to clear.');
+          return;
+        }
+
+        if (
+          confirm(
+            `Clear ${deletedPhotos.length} deleted photo record(s)?\n\nOnly do this after running the Cloudinary cleanup script.`,
+          )
+        ) {
+          deletedPhotos = [];
+          saveDeletedPhotos();
+          updateDeletedCount();
+          alert('Deleted photos list cleared.');
+        }
+      }
+
+      function updateDeletedCount() {
+        const el = document.getElementById('deletedCount');
+        if (el) {
+          el.textContent = deletedPhotos.length > 0 ? `(${deletedPhotos.length} pending)` : '';
+        }
+      }
+
       // Keyboard shortcuts
       document.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT') return;
@@ -717,6 +891,9 @@
         } else if (e.key.toLowerCase() === 'b' && !e.shiftKey && !e.ctrlKey) {
           // Subaru
           toggleTag('vehicles', 'subaru');
+        } else if (e.key === 'Delete') {
+          // Delete current photo
+          deleteCurrentPhoto();
         }
       });
     </script>
