@@ -1,0 +1,169 @@
+<div class="filter-section">
+  <h3 class="filter-title">Dates</h3>
+
+  <button class="filter-btn all-days-btn" [class.selected]="isAllDaysSelected()" (click)="toggleAllDays()">
+    All Yellowstone Days
+  </button>
+
+  <div class="date-grid">
+    @for (date of yellowstoneDates(); track date) {
+    <button
+      class="filter-btn date-btn"
+      [class.selected]="isDateSelected(date)"
+      [class.disabled]="isAllDaysSelected()"
+      (click)="toggleDate(date)"
+    >
+      {{ formatDate(date) }}
+    </button>
+    }
+  </div>
+
+  <div class="trip-toggles" [class.disabled]="!isAllDaysSelected()">
+    <label class="toggle-label">
+      <input
+        type="checkbox"
+        [checked]="filters().includeTripOut"
+        [disabled]="!isAllDaysSelected()"
+        (change)="toggleTripOut()"
+      />
+      <span>Include trip out</span>
+    </label>
+    <label class="toggle-label">
+      <input
+        type="checkbox"
+        [checked]="filters().includeTripBack"
+        [disabled]="!isAllDaysSelected()"
+        (change)="toggleTripBack()"
+      />
+      <span>Include trip back</span>
+    </label>
+  </div>
+</div>
+
+<div class="filter-section">
+  <div class="filter-header">
+    <h3 class="filter-title">People</h3>
+    @if (filters().people.size > 0) {
+    <button class="clear-btn" (click)="clearPeopleFilter()">Clear</button>
+    }
+  </div>
+  <div class="filter-chips">
+    @for (person of people(); track person) {
+    <button class="filter-chip" [class.selected]="isPersonSelected(person)" (click)="togglePerson(person)">
+      {{ person }}
+    </button>
+    }
+  </div>
+</div>
+
+<div class="filter-section">
+  <div class="filter-header">
+    <h3 class="filter-title">Camera</h3>
+    @if (filters().cameraOwners.size > 0) {
+    <button class="clear-btn" (click)="clearCameraFilter()">Clear</button>
+    }
+  </div>
+  <div class="filter-chips">
+    @for (owner of cameraOwners; track owner) {
+    <button class="filter-chip" [class.selected]="isCameraOwnerSelected(owner)" (click)="toggleCameraOwner(owner)">
+      {{ owner }}'s camera
+    </button>
+    }
+  </div>
+</div>
+
+<div class="filter-section">
+  <div class="filter-header">
+    <h3 class="filter-title">Geothermal Features</h3>
+    @if (filters().geothermals.size > 0) {
+    <button class="clear-btn" (click)="clearGeothermalFilter()">Clear</button>
+    }
+  </div>
+  <div class="filter-chips">
+    @for (geo of geothermalTypes; track geo.value) {
+    <button
+      class="filter-chip"
+      [class.selected]="isGeothermalSelected(geo.value)"
+      (click)="toggleGeothermal(geo.value)"
+    >
+      {{ geo.label }}
+    </button>
+    }
+  </div>
+</div>
+
+<div class="filter-section">
+  <div class="filter-header">
+    <h3 class="filter-title">Wildlife</h3>
+    @if (filters().wildlife.size > 0) {
+    <button class="clear-btn" (click)="clearWildlifeFilter()">Clear</button>
+    }
+  </div>
+  <div class="filter-chips">
+    @for (animal of wildlifeTypes; track animal.value) {
+    <button
+      class="filter-chip"
+      [class.selected]="isWildlifeSelected(animal.value)"
+      (click)="toggleWildlife(animal.value)"
+    >
+      {{ animal.label }}
+    </button>
+    }
+  </div>
+</div>
+
+<div class="filter-section">
+  <div class="filter-header">
+    <h3 class="filter-title">Vehicles</h3>
+    @if (filters().vehicles.size > 0) {
+    <button class="clear-btn" (click)="clearVehicleFilter()">Clear</button>
+    }
+  </div>
+  <div class="filter-chips">
+    @for (vehicle of vehicleTypes; track vehicle.value) {
+    <button
+      class="filter-chip"
+      [class.selected]="isVehicleSelected(vehicle.value)"
+      (click)="toggleVehicle(vehicle.value)"
+    >
+      {{ vehicle.label }}
+    </button>
+    }
+  </div>
+</div>
+
+<div class="filter-section">
+  <div class="filter-header">
+    <h3 class="filter-title">National Park Sites</h3>
+    @if (filters().npsSites.size > 0) {
+    <button class="clear-btn" (click)="clearNpsSiteFilter()">Clear</button>
+    }
+  </div>
+  <div class="filter-chips">
+    @for (site of npsSiteTypes; track site.value) {
+    <button class="filter-chip" [class.selected]="isNpsSiteSelected(site.value)" (click)="toggleNpsSite(site.value)">
+      {{ site.label }}
+    </button>
+    }
+  </div>
+</div>
+
+<div class="filter-section">
+  <div class="filter-header">
+    <h3 class="filter-title">Other Attractions</h3>
+    @if (filters().attractions.size > 0) {
+    <button class="clear-btn" (click)="clearAttractionFilter()">Clear</button>
+    }
+  </div>
+  <div class="filter-chips">
+    @for (attraction of attractionTypes; track attraction.value) {
+    <button
+      class="filter-chip"
+      [class.selected]="isAttractionSelected(attraction.value)"
+      (click)="toggleAttraction(attraction.value)"
+    >
+      {{ attraction.label }}
+    </button>
+    }
+  </div>
+</div>

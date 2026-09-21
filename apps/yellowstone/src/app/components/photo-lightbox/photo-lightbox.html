@@ -1,0 +1,80 @@
+<!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events -->
+<div class="lightbox-backdrop" (click)="onBackdropClick($event)" role="dialog" aria-modal="true">
+  <div class="lightbox-container">
+    <button class="close-btn" (click)="onCloseClick()" aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="lightbox-content">
+      @if (canGoPrevious()) {
+      <button class="nav-btn nav-prev" (click)="goPrevious()" aria-label="Previous photo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      }
+
+      <div class="image-wrapper">
+        <img [src]="photo().medium" [alt]="photo().filename" class="lightbox-image" />
+      </div>
+
+      @if (canGoNext()) {
+      <button class="nav-btn nav-next" (click)="goNext()" aria-label="Next photo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+      }
+    </div>
+
+    <div class="lightbox-info">
+      <div class="photo-meta">
+        <span class="photo-date">{{ formatDate(photo().dateTaken) }}</span>
+        <span class="photo-camera">{{ photo().cameraOwner }}'s camera</span>
+      </div>
+      <div class="photo-tags">
+        @if (photo().people.length > 0) {
+        <div class="tag-group">
+          @for (person of photo().people; track person) {
+          <span class="tag tag-person">{{ person }}</span>
+          }
+        </div>
+        } @if (photo().geothermals.length > 0) {
+        <div class="tag-group">
+          @for (geo of photo().geothermals; track geo) {
+          <span class="tag tag-geothermal">{{ formatGeothermal(geo) }}</span>
+          }
+        </div>
+        } @if (photo().wildlife.length > 0) {
+        <div class="tag-group">
+          @for (animal of photo().wildlife; track animal) {
+          <span class="tag tag-wildlife">{{ formatWildlife(animal) }}</span>
+          }
+        </div>
+        } @if (photo().vehicles.length > 0) {
+        <div class="tag-group">
+          @for (vehicle of photo().vehicles; track vehicle) {
+          <span class="tag tag-vehicle">{{ formatVehicle(vehicle) }}</span>
+          }
+        </div>
+        } @if (photo().npsSites.length > 0) {
+        <div class="tag-group">
+          @for (site of photo().npsSites; track site) {
+          <span class="tag tag-nps">{{ formatNpsSite(site) }}</span>
+          }
+        </div>
+        } @if (photo().attractions.length > 0) {
+        <div class="tag-group">
+          @for (attraction of photo().attractions; track attraction) {
+          <span class="tag tag-attraction">{{ formatAttraction(attraction) }}</span>
+          }
+        </div>
+        }
+      </div>
+      <div class="photo-counter">{{ currentIndex() + 1 }} of {{ photos().length }}</div>
+    </div>
+  </div>
+</div>

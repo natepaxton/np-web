@@ -84,12 +84,12 @@ describe('App', () => {
     );
   });
 
-  it('shows navigation with Fuel link when authenticated', async () => {
+  it('shows navigation with Photos link when authenticated', async () => {
     isAuthenticated$.next(true);
     user$.next({ email: 'test@example.com' });
     const el = await render();
 
     expect(el.querySelector('.app-title')?.textContent).toBe('Yellowstone Road Trip');
-    expect(el.querySelector('.nav-link')?.textContent?.trim()).toBe('Fuel');
+    expect(el.querySelector('.nav-link')?.textContent?.trim()).toBe('Photos');
   });
 });

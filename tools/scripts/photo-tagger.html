@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yellowstone Photo Tagger</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #1a1a2e;
+        color: #fff;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      h1 {
+        font-size: 1.25rem;
+      }
+      .progress {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .controls {
+        display: flex;
+        gap: 0.5rem;
+      }
+      button {
+        background: #4ade80;
+        color: #1a1a2e;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s;
+      }
+      button:hover {
+        background: #22c55e;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      button.secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+      button.secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .main-content {
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 1rem;
+        height: calc(100vh - 140px);
+      }
+      .photo-panel {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .photo-panel img {
+        max-width: 100%;
+        max-height: calc(100vh - 250px);
+        border-radius: 0.5rem;
+      }
+      .photo-info {
+        margin-top: 1rem;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.875rem;
+      }
+
+      .tags-panel {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        overflow-y: auto;
+      }
+      .tag-section {
+        margin-bottom: 1rem;
+      }
+      .tag-section h3 {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 0.375rem;
+      }
+      .tag-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+      .tag-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.7);
+        padding: 0.25rem 0.5rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .tag-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.25);
+      }
+      .tag-btn.selected {
+        background: rgba(74, 222, 128, 0.2);
+        border-color: #4ade80;
+        color: #4ade80;
+      }
+      .tag-btn.selected.orange {
+        background: rgba(251, 146, 60, 0.2);
+        border-color: #fb923c;
+        color: #fb923c;
+      }
+      .tag-btn.selected.purple {
+        background: rgba(129, 140, 248, 0.2);
+        border-color: #818cf8;
+        color: #818cf8;
+      }
+      .tag-btn.selected.gray {
+        background: rgba(156, 163, 175, 0.2);
+        border-color: #9ca3af;
+        color: #9ca3af;
+      }
+      .tag-btn.selected.teal {
+        background: rgba(52, 211, 153, 0.2);
+        border-color: #34d399;
+        color: #34d399;
+      }
+      .tag-btn.selected.pink {
+        background: rgba(244, 114, 182, 0.2);
+        border-color: #f472b6;
+        color: #f472b6;
+      }
+
+      .nav-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+      .nav-buttons button {
+        flex: 1;
+      }
+
+      .filter-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+      .filter-bar select,
+      .filter-bar input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+      }
+      .filter-bar input {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .stats {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 0.5rem;
+        line-height: 1.4;
+      }
+
+      #loadSection {
+        text-align: center;
+        padding: 3rem;
+      }
+      #loadSection input[type='file'] {
+        margin: 1rem 0;
+      }
+
+      .keyboard-hints {
+        font-size: 0.65rem;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 0.75rem;
+        line-height: 1.6;
+      }
+      .keyboard-hints kbd {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.125rem 0.25rem;
+        border-radius: 0.25rem;
+        margin: 0 0.125rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="loadSection">
+        <h1>Yellowstone Photo Tagger</h1>
+        <p style="margin-top: 1rem; color: rgba(255, 255, 255, 0.7)">Load your photos.json file to start tagging</p>
+        <input type="file" id="fileInput" accept=".json" />
+        <br />
+        <button onclick="loadFile()">Load Photos</button>
+        <div
+          id="resumeSection"
+          style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1)"
+        >
+          <p style="color: #4ade80; margin-bottom: 1rem">You have saved progress from a previous session</p>
+          <button onclick="resumeSession()">Resume Previous Session</button>
+          <button class="secondary" onclick="clearSavedSession()">Clear Saved Data</button>
+        </div>
+      </div>
+
+      <div id="mainApp" style="display: none">
+        <header>
+          <h1>Yellowstone Photo Tagger</h1>
+          <span class="progress" id="progress">0 / 0</span>
+          <div class="controls">
+            <span
+              id="saveStatus"
+              style="color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; margin-right: 0.5rem"
+            ></span>
+            <button class="secondary" onclick="exportJson()">Export JSON</button>
+            <button class="secondary" onclick="copyJson()">Copy to Clipboard</button>
+          </div>
+        </header>
+
+        <div class="filter-bar">
+          <select id="filterCamera" onchange="applyFilters()">
+            <option value="">All Cameras</option>
+            <option value="Nate">Nate's camera</option>
+            <option value="Laura">Laura's camera</option>
+            <option value="Travis">Travis's camera</option>
+          </select>
+          <select id="filterCategory" onchange="applyFilters()">
+            <option value="">All Categories</option>
+            <option value="trip-out">Trip Out</option>
+            <option value="yellowstone">Yellowstone</option>
+            <option value="trip-back">Trip Back</option>
+          </select>
+          <select id="filterTagged" onchange="applyFilters()">
+            <option value="">All Photos</option>
+            <option value="untagged">Untagged Only</option>
+            <option value="tagged">Tagged Only</option>
+          </select>
+          <input type="text" id="searchInput" placeholder="Search filename..." oninput="applyFilters()" />
+        </div>
+
+        <div class="main-content">
+          <div class="photo-panel">
+            <img id="photoImage" src="" alt="" />
+            <div class="photo-info" id="photoInfo"></div>
+          </div>
+
+          <div class="tags-panel">
+            <div class="tag-section">
+              <h3>People (1-7)</h3>
+              <div class="tag-grid" id="peopleTags"></div>
+            </div>
+
+            <div class="tag-section">
+              <h3>Vehicles (V, B)</h3>
+              <div class="tag-grid" id="vehicleTags"></div>
+            </div>
+
+            <div class="tag-section">
+              <h3>Geothermal Features (Shift+1-5)</h3>
+              <div class="tag-grid" id="geothermalTags"></div>
+            </div>
+
+            <div class="tag-section">
+              <h3>Wildlife (Ctrl+1-9)</h3>
+              <div class="tag-grid" id="wildlifeTags"></div>
+            </div>
+
+            <div class="tag-section">
+              <h3>National Park Sites (click to toggle)</h3>
+              <div class="tag-grid" id="npsTags"></div>
+            </div>
+
+            <div class="tag-section">
+              <h3>Other Attractions (click to toggle)</h3>
+              <div class="tag-grid" id="attractionTags"></div>
+            </div>
+
+            <div class="nav-buttons">
+              <button class="secondary" onclick="prevPhoto()">← Previous</button>
+              <button onclick="nextPhoto()">Next →</button>
+            </div>
+
+            <div class="stats" id="stats"></div>
+
+            <div class="keyboard-hints">
+              <kbd>←</kbd> <kbd>→</kbd> Navigate<br />
+              <kbd>1-7</kbd> People<br />
+              <kbd>V</kbd> Camper <kbd>B</kbd> Subaru<br />
+              <kbd>Shift+1-5</kbd> Geothermal<br />
+              <kbd>Ctrl+1-9</kbd> Wildlife<br />
+              <span style="color: #4ade80; font-size: 0.7rem; margin-top: 0.5rem; display: block"
+                >Progress auto-saves to browser</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const PEOPLE = ['Nate', 'Laura', 'Greg', 'Nancy', 'Travis', 'Amy', 'Kennedy'];
+      const VEHICLES = [
+        { value: 'camper', label: 'Camper', key: 'v' },
+        { value: 'subaru', label: 'Subaru', key: 'b' },
+      ];
+      const GEOTHERMALS = ['geyser', 'spring', 'paint-pot', 'mudpot', 'fumarole'];
+      const WILDLIFE = [
+        'bison',
+        'bear',
+        'moose',
+        'elk',
+        'fox',
+        'wolf',
+        'deer',
+        'pronghorn',
+        'prairie-dog',
+        'bighorn-sheep',
+        'other',
+      ];
+      const NPS_SITES = [
+        { value: 'mammoth-cave', label: 'Mammoth Cave NP' },
+        { value: 'ste-genevieve', label: 'Ste. Geneviève NHP' },
+        { value: 'ulysses-grant', label: 'Ulysses S. Grant NHS' },
+        { value: 'harry-truman', label: 'Harry S Truman NHS' },
+        { value: 'brown-v-board', label: 'Brown v. Board NHP' },
+        { value: 'homestead', label: 'Homestead NHP' },
+        { value: 'minuteman-missile', label: 'Minuteman Missile NHS' },
+        { value: 'badlands', label: 'Badlands NP' },
+        { value: 'wind-cave', label: 'Wind Cave NP' },
+        { value: 'jewel-cave', label: 'Jewel Cave NM' },
+        { value: 'mount-rushmore', label: 'Mount Rushmore NM' },
+        { value: 'devils-tower', label: 'Devils Tower NM' },
+        { value: 'yellowstone', label: 'Yellowstone NP' },
+        { value: 'grand-teton', label: 'Grand Teton NP' },
+        { value: 'little-bighorn', label: 'Little Bighorn NM' },
+        { value: 'theodore-roosevelt', label: 'Theodore Roosevelt NP' },
+        { value: 'knife-river', label: 'Knife River NHS' },
+        { value: 'indiana-dunes', label: 'Indiana Dunes NP' },
+      ];
+      const ATTRACTIONS = [
+        { value: 'wall-drug', label: 'Wall Drug' },
+        { value: 'needles-highway', label: 'Needles Highway' },
+      ];
+
+      const STORAGE_KEY = 'yellowstone-photo-tagger';
+      let photoData = null;
+      let filteredPhotos = [];
+      let currentIndex = 0;
+      let autoSaveTimeout = null;
+
+      // Check for saved session on page load
+      document.addEventListener('DOMContentLoaded', () => {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          document.getElementById('resumeSection').style.display = 'block';
+        }
+      });
+
+      function resumeSession() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          if (saved && saved.photoData) {
+            photoData = saved.photoData;
+            currentIndex = saved.currentIndex || 0;
+
+            document.getElementById('loadSection').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+
+            initTagButtons();
+
+            // Restore filter settings
+            if (saved.filters) {
+              document.getElementById('filterCamera').value = saved.filters.camera || '';
+              document.getElementById('filterCategory').value = saved.filters.category || '';
+              document.getElementById('filterTagged').value = saved.filters.tagged || '';
+              document.getElementById('searchInput').value = saved.filters.search || '';
+            }
+
+            applyFilters();
+
+            // Try to restore position in filtered list
+            if (saved.currentPhotoId) {
+              const idx = filteredPhotos.findIndex((p) => p.id === saved.currentPhotoId);
+              if (idx !== -1) {
+                currentIndex = idx;
+                showPhoto();
+              }
+            }
+
+            updateSaveStatus('Restored from previous session');
+          }
+        } catch (err) {
+          alert('Error restoring session: ' + err.message);
+        }
+      }
+
+      function clearSavedSession() {
+        if (confirm('Are you sure you want to clear saved progress? This cannot be undone.')) {
+          localStorage.removeItem(STORAGE_KEY);
+          document.getElementById('resumeSection').style.display = 'none';
+        }
+      }
+
+      function autoSave() {
+        if (!photoData) return;
+
+        // Debounce saves
+        if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+
+        autoSaveTimeout = setTimeout(() => {
+          const currentPhoto = filteredPhotos[currentIndex];
+          const saveData = {
+            photoData: photoData,
+            currentIndex: currentIndex,
+            currentPhotoId: currentPhoto?.id,
+            filters: {
+              camera: document.getElementById('filterCamera').value,
+              category: document.getElementById('filterCategory').value,
+              tagged: document.getElementById('filterTagged').value,
+              search: document.getElementById('searchInput').value,
+            },
+            savedAt: new Date().toISOString(),
+          };
+
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+            updateSaveStatus('Auto-saved');
+          } catch (err) {
+            // localStorage might be full
+            updateSaveStatus('Auto-save failed: ' + err.message);
+          }
+        }, 500);
+      }
+
+      function updateSaveStatus(message) {
+        const el = document.getElementById('saveStatus');
+        el.textContent = message;
+        setTimeout(() => {
+          el.textContent = '';
+        }, 3000);
+      }
+
+      function loadFile() {
+        const input = document.getElementById('fileInput');
+        if (!input.files.length) {
+          alert('Please select a photos.json file');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            photoData = JSON.parse(e.target.result);
+
+            // Ensure all photos have all tag fields
+            photoData.photos.forEach((p) => {
+              if (!p.geothermals) p.geothermals = [];
+              if (!p.wildlife) p.wildlife = [];
+              if (!p.vehicles) p.vehicles = [];
+              if (!p.npsSites) p.npsSites = [];
+              if (!p.attractions) p.attractions = [];
+            });
+
+            document.getElementById('loadSection').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+
+            initTagButtons();
+            applyFilters();
+          } catch (err) {
+            alert('Error parsing JSON: ' + err.message);
+          }
+        };
+        reader.readAsText(input.files[0]);
+      }
+
+      function initTagButtons() {
+        document.getElementById('peopleTags').innerHTML = PEOPLE.map(
+          (p, i) =>
+            `<button class="tag-btn" data-type="people" data-value="${p}" onclick="toggleTag('people', '${p}')">${p} <small>(${i + 1})</small></button>`,
+        ).join('');
+
+        document.getElementById('vehicleTags').innerHTML = VEHICLES.map(
+          (v) =>
+            `<button class="tag-btn gray" data-type="vehicles" data-value="${v.value}" onclick="toggleTag('vehicles', '${v.value}')">${v.label} <small>(${v.key.toUpperCase()})</small></button>`,
+        ).join('');
+
+        document.getElementById('geothermalTags').innerHTML = GEOTHERMALS.map(
+          (g, i) =>
+            `<button class="tag-btn orange" data-type="geothermals" data-value="${g}" onclick="toggleTag('geothermals', '${g}')">${formatLabel(g)} <small>(⇧${i + 1})</small></button>`,
+        ).join('');
+
+        document.getElementById('wildlifeTags').innerHTML = WILDLIFE.map(
+          (w, i) =>
+            `<button class="tag-btn purple" data-type="wildlife" data-value="${w}" onclick="toggleTag('wildlife', '${w}')">${formatLabel(w)} <small>(⌃${i + 1})</small></button>`,
+        ).join('');
+
+        document.getElementById('npsTags').innerHTML = NPS_SITES.map(
+          (s) =>
+            `<button class="tag-btn teal" data-type="npsSites" data-value="${s.value}" onclick="toggleTag('npsSites', '${s.value}')">${s.label}</button>`,
+        ).join('');
+
+        document.getElementById('attractionTags').innerHTML = ATTRACTIONS.map(
+          (a) =>
+            `<button class="tag-btn pink" data-type="attractions" data-value="${a.value}" onclick="toggleTag('attractions', '${a.value}')">${a.label}</button>`,
+        ).join('');
+      }
+
+      function formatLabel(str) {
+        return str
+          .split('-')
+          .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+          .join(' ');
+      }
+
+      function applyFilters() {
+        const camera = document.getElementById('filterCamera').value;
+        const category = document.getElementById('filterCategory').value;
+        const tagged = document.getElementById('filterTagged').value;
+        const search = document.getElementById('searchInput').value.toLowerCase();
+
+        filteredPhotos = photoData.photos.filter((p) => {
+          if (camera && p.cameraOwner !== camera) return false;
+          if (category && p.dateCategory !== category) return false;
+          if (search && !p.filename.toLowerCase().includes(search)) return false;
+
+          const isTagged =
+            p.people.length > 0 ||
+            p.geothermals.length > 0 ||
+            p.wildlife.length > 0 ||
+            p.vehicles.length > 0 ||
+            p.npsSites.length > 0 ||
+            p.attractions.length > 0;
+          if (tagged === 'tagged' && !isTagged) return false;
+          if (tagged === 'untagged' && isTagged) return false;
+
+          return true;
+        });
+
+        currentIndex = 0;
+        showPhoto();
+        updateStats();
+      }
+
+      function showPhoto() {
+        if (filteredPhotos.length === 0) {
+          document.getElementById('photoImage').src = '';
+          document.getElementById('photoInfo').innerHTML = 'No photos match filters';
+          document.getElementById('progress').textContent = '0 / 0';
+          return;
+        }
+
+        const photo = filteredPhotos[currentIndex];
+        document.getElementById('photoImage').src = photo.medium;
+        document.getElementById('photoInfo').innerHTML = `
+        <strong>${photo.filename}</strong><br>
+        ${photo.cameraOwner}'s camera · ${formatDate(photo.dateTaken)} · ${photo.dateCategory}
+      `;
+        document.getElementById('progress').textContent = `${currentIndex + 1} / ${filteredPhotos.length}`;
+
+        // Update tag button states
+        document.querySelectorAll('.tag-btn').forEach((btn) => {
+          const type = btn.dataset.type;
+          const value = btn.dataset.value;
+          const isSelected = photo[type]?.includes(value);
+          btn.classList.toggle('selected', isSelected);
+        });
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return 'Unknown date';
+        return new Date(dateStr).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+        });
+      }
+
+      function toggleTag(type, value) {
+        if (filteredPhotos.length === 0) return;
+
+        const photo = filteredPhotos[currentIndex];
+        if (!photo[type]) photo[type] = [];
+        const arr = photo[type];
+        const idx = arr.indexOf(value);
+
+        if (idx === -1) {
+          arr.push(value);
+        } else {
+          arr.splice(idx, 1);
+        }
+
+        showPhoto();
+        updateStats();
+        autoSave();
+      }
+
+      function prevPhoto() {
+        if (currentIndex > 0) {
+          currentIndex--;
+          showPhoto();
+          autoSave();
+        }
+      }
+
+      function nextPhoto() {
+        if (currentIndex < filteredPhotos.length - 1) {
+          currentIndex++;
+          showPhoto();
+          autoSave();
+        }
+      }
+
+      function updateStats() {
+        const total = photoData.photos.length;
+        const withPeople = photoData.photos.filter((p) => p.people.length > 0).length;
+        const withGeo = photoData.photos.filter((p) => p.geothermals?.length > 0).length;
+        const withWildlife = photoData.photos.filter((p) => p.wildlife?.length > 0).length;
+        const withVehicles = photoData.photos.filter((p) => p.vehicles?.length > 0).length;
+        const withNps = photoData.photos.filter((p) => p.npsSites?.length > 0).length;
+        const withAttractions = photoData.photos.filter((p) => p.attractions?.length > 0).length;
+        const anyTag = photoData.photos.filter(
+          (p) =>
+            p.people.length > 0 ||
+            p.geothermals?.length > 0 ||
+            p.wildlife?.length > 0 ||
+            p.vehicles?.length > 0 ||
+            p.npsSites?.length > 0 ||
+            p.attractions?.length > 0,
+        ).length;
+
+        document.getElementById('stats').innerHTML = `
+        Tagged: ${anyTag}/${total}<br>
+        People: ${withPeople} · Vehicles: ${withVehicles} · Geothermal: ${withGeo} · Wildlife: ${withWildlife}<br>
+        NPS Sites: ${withNps} · Attractions: ${withAttractions}
+      `;
+      }
+
+      function exportJson() {
+        const blob = new Blob([JSON.stringify(photoData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'photos.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function copyJson() {
+        navigator.clipboard
+          .writeText(JSON.stringify(photoData, null, 2))
+          .then(() => alert('JSON copied to clipboard!'))
+          .catch((err) => alert('Failed to copy: ' + err));
+      }
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT') return;
+
+        if (e.key === 'ArrowLeft') {
+          prevPhoto();
+        } else if (e.key === 'ArrowRight') {
+          nextPhoto();
+        } else if (e.shiftKey && e.key >= '1' && e.key <= '5') {
+          // Geothermal shortcuts (Shift + 1-5)
+          const idx = parseInt(e.key) - 1;
+          if (GEOTHERMALS[idx]) {
+            toggleTag('geothermals', GEOTHERMALS[idx]);
+          }
+        } else if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+          // Wildlife shortcuts (Ctrl + 1-9)
+          e.preventDefault();
+          const idx = parseInt(e.key) - 1;
+          if (WILDLIFE[idx]) {
+            toggleTag('wildlife', WILDLIFE[idx]);
+          }
+        } else if (e.key >= '1' && e.key <= '7' && !e.shiftKey && !e.ctrlKey) {
+          // People shortcuts (1-7)
+          const idx = parseInt(e.key) - 1;
+          if (PEOPLE[idx]) {
+            toggleTag('people', PEOPLE[idx]);
+          }
+        } else if (e.key.toLowerCase() === 'v' && !e.shiftKey && !e.ctrlKey) {
+          // Camper
+          toggleTag('vehicles', 'camper');
+        } else if (e.key.toLowerCase() === 'b' && !e.shiftKey && !e.ctrlKey) {
+          // Subaru
+          toggleTag('vehicles', 'subaru');
+        }
+      });
+    </script>
+  </body>
+</html>

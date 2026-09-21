@@ -1,0 +1,24 @@
+<div class="photos-page">
+  <aside class="filters-sidebar">
+    <ys-photo-filters
+      [yellowstoneDates]="yellowstoneDates"
+      [people]="metadata.people"
+      [filters]="filters()"
+      (filtersChange)="onFiltersChange($event)"
+    />
+    <div class="photo-count">{{ photosWithLocation().length }} photos on map</div>
+  </aside>
+
+  <main class="map-container">
+    <ys-photo-map [photos]="photosWithLocation()" (photoSelect)="onPhotoSelect($event)" />
+  </main>
+</div>
+
+@if (selectedPhoto()) {
+<ys-photo-lightbox
+  [photo]="selectedPhoto()!"
+  [photos]="lightboxPhotos()"
+  (closed)="onLightboxClose()"
+  (navigate)="onLightboxNavigate($event)"
+/>
+}

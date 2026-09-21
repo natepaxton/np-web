@@ -8,6 +8,6 @@ test('shows login screen for unauthenticated users', async ({ page }) => {
 
   // Unauthenticated users should see the login screen
   await expect(page.locator('.login-card h1')).toHaveText('Yellowstone Road Trip');
-  await expect(page.locator('.login-card p')).toHaveText('Sign in to view the fuel tracker dashboard');
+  await expect(page.locator('.login-card p')).toHaveText('Sign in to view trip photos and stats');
   await expect(page.locator('.login-button')).toBeVisible();
 });

@@ -1,0 +1,30 @@
+.photos-page {
+  display: flex;
+  height: calc(100vh - 52px); // Subtract header height
+  background: #1a1a2e;
+}
+
+.filters-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: rgba(255, 255, 255, 0.03);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-count {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.map-container {
+  flex: 1;
+  position: relative;
+}

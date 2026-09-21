@@ -13,7 +13,10 @@ import { AuthService } from '@auth0/auth0-angular';
 export class App {
   private readonly auth = inject(AuthService);
 
-  protected readonly navItems = [{ label: 'Fuel', path: '/fuel' }];
+  protected readonly navItems = [
+    { label: 'Photos', path: '/photos' },
+    { label: 'Fuel', path: '/fuel' },
+  ];
 
   protected readonly isLoading = toSignal(this.auth.isLoading$, { initialValue: true });
   protected readonly isAuthenticated = toSignal(this.auth.isAuthenticated$, { initialValue: false });
