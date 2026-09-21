@@ -12,6 +12,7 @@ module.exports = {
     '!src/**/app.config.ts',
     '!src/**/*.routes.ts',
     '!src/**/*.g.ts',
+    '!src/environments/**',
   ],
   coverageThreshold: {
     global: { lines: 60, statements: 60, functions: 60, branches: 50 },
