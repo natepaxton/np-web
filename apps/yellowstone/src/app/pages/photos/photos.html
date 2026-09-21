@@ -6,24 +6,19 @@
       [filters]="filters()"
       (filtersChange)="onFiltersChange($event)"
     />
-    <div class="photo-count">
-      {{ photosWithLocation().length }} photos on map
-    </div>
+    <div class="photo-count">{{ photosWithLocation().length }} photos on map</div>
   </aside>
 
   <main class="map-container">
-    <ys-photo-map
-      [photos]="photosWithLocation()"
-      (photoSelect)="onPhotoSelect($event)"
-    />
+    <ys-photo-map [photos]="photosWithLocation()" (photoSelect)="onPhotoSelect($event)" />
   </main>
 </div>
 
 @if (selectedPhoto()) {
-  <ys-photo-lightbox
-    [photo]="selectedPhoto()!"
-    [photos]="lightboxPhotos()"
-    (closed)="onLightboxClose()"
-    (navigate)="onLightboxNavigate($event)"
-  />
+<ys-photo-lightbox
+  [photo]="selectedPhoto()!"
+  [photos]="lightboxPhotos()"
+  (closed)="onLightboxClose()"
+  (navigate)="onLightboxNavigate($event)"
+/>
 }

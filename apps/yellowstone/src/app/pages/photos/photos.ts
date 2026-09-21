@@ -3,13 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PhotoMapComponent } from '../../components/photo-map/photo-map';
 import { PhotoFiltersComponent } from '../../components/photo-filters/photo-filters';
 import { PhotoLightboxComponent } from '../../components/photo-lightbox/photo-lightbox';
-import {
-  Photo,
-  PhotoData,
-  PhotoFilters,
-  filterPhotos,
-  getYellowstoneDates,
-} from '../../data/photos';
+import { Photo, PhotoData, PhotoFilters, filterPhotos, getYellowstoneDates } from '../../data/photos';
 import photoData from '../../data/photos.json';
 
 @Component({
@@ -28,7 +22,7 @@ export class Photos {
   protected readonly yellowstoneDates = getYellowstoneDates(
     this.allPhotos,
     this.metadata.yellowstoneStart,
-    this.metadata.yellowstoneEnd
+    this.metadata.yellowstoneEnd,
   );
 
   protected readonly filters = signal<PhotoFilters>({
@@ -45,12 +39,7 @@ export class Photos {
   });
 
   protected readonly filteredPhotos = computed(() => {
-    return filterPhotos(
-      this.allPhotos,
-      this.filters(),
-      this.metadata.yellowstoneStart,
-      this.metadata.yellowstoneEnd
-    );
+    return filterPhotos(this.allPhotos, this.filters(), this.metadata.yellowstoneStart, this.metadata.yellowstoneEnd);
   });
 
   protected readonly photosWithLocation = computed(() => {

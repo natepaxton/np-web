@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "license": "UNLICENSED",
-  "scripts": {},
+  "scripts": {
+    "pre-push": "node tools/scripts/pre-push-check.mjs"
+  },
   "devDependencies": {
     "@angular-devkit/core": "~22.1.0",
     "@angular-devkit/schematics": "~22.1.0",

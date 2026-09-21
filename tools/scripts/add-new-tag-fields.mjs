@@ -40,7 +40,7 @@ async function main() {
   console.log(`Updated ${updated} photos with new fields`);
 
   // Reorder fields in each photo for consistency
-  data.photos = data.photos.map(photo => ({
+  data.photos = data.photos.map((photo) => ({
     id: photo.id,
     filename: photo.filename,
     cameraOwner: photo.cameraOwner,

@@ -149,7 +149,9 @@ async function main() {
 
   if (!sourceFolder || !outputPath) {
     console.error('Usage: node extract-photo-metadata.mjs <source-folder> <output-json>');
-    console.error('Example: node extract-photo-metadata.mjs C:/workspace/yellowstone apps/yellowstone/src/app/data/photos.json');
+    console.error(
+      'Example: node extract-photo-metadata.mjs C:/workspace/yellowstone apps/yellowstone/src/app/data/photos.json',
+    );
     process.exit(1);
   }
 
@@ -190,8 +192,8 @@ async function main() {
   });
 
   // Summary stats
-  const withGps = photos.filter(p => p.lat && p.lng).length;
-  const withDate = photos.filter(p => p.dateTaken).length;
+  const withGps = photos.filter((p) => p.lat && p.lng).length;
+  const withDate = photos.filter((p) => p.dateTaken).length;
   const byCategory = photos.reduce((acc, p) => {
     acc[p.dateCategory] = (acc[p.dateCategory] || 0) + 1;
     return acc;

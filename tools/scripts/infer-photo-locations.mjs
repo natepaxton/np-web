@@ -25,7 +25,7 @@ async function main() {
 
   // Get Nate's photos with GPS, sorted by date
   const nateWithGps = data.photos
-    .filter(p => p.cameraOwner === 'Nate' && p.lat !== null && p.dateTaken)
+    .filter((p) => p.cameraOwner === 'Nate' && p.lat !== null && p.dateTaken)
     .sort((a, b) => new Date(a.dateTaken) - new Date(b.dateTaken));
 
   console.log(`Reference photos (Nate with GPS): ${nateWithGps.length}`);
@@ -77,12 +77,16 @@ async function main() {
         inferred++;
 
         if (inferred <= 10) {
-          console.log(`  ${photo.cameraOwner} ${photo.filename}: inferred from ${closestPhoto.filename} (${diffMinutes.toFixed(1)} min apart)`);
+          console.log(
+            `  ${photo.cameraOwner} ${photo.filename}: inferred from ${closestPhoto.filename} (${diffMinutes.toFixed(1)} min apart)`,
+          );
         }
       } else {
         tooFar++;
         if (tooFar <= 5) {
-          console.log(`  Skipped ${photo.cameraOwner} ${photo.filename}: closest is ${diffMinutes.toFixed(0)} min away`);
+          console.log(
+            `  Skipped ${photo.cameraOwner} ${photo.filename}: closest is ${diffMinutes.toFixed(0)} min away`,
+          );
         }
       }
     }
@@ -94,7 +98,7 @@ async function main() {
   console.log(`  Too far from reference (>${MAX_TIME_DIFF_MINUTES} min): ${tooFar}`);
 
   // Count final stats
-  const withGps = data.photos.filter(p => p.lat !== null).length;
+  const withGps = data.photos.filter((p) => p.lat !== null).length;
   console.log(`\nFinal: ${withGps}/${data.photos.length} photos with GPS`);
 
   // Write updated data

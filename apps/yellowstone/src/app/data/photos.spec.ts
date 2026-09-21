@@ -1,11 +1,4 @@
-import {
-  getUniqueDates,
-  getYellowstoneDates,
-  formatDateForDisplay,
-  filterPhotos,
-  Photo,
-  PhotoFilters,
-} from './photos';
+import { getUniqueDates, getYellowstoneDates, formatDateForDisplay, filterPhotos, Photo, PhotoFilters } from './photos';
 
 const mockPhotos: Photo[] = [
   {

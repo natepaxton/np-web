@@ -3,7 +3,18 @@
  */
 
 export type GeothermalType = 'geyser' | 'spring' | 'paint-pot' | 'mudpot' | 'fumarole';
-export type WildlifeType = 'bison' | 'bear' | 'moose' | 'elk' | 'fox' | 'wolf' | 'deer' | 'pronghorn' | 'prairie-dog' | 'bighorn-sheep' | 'other';
+export type WildlifeType =
+  | 'bison'
+  | 'bear'
+  | 'moose'
+  | 'elk'
+  | 'fox'
+  | 'wolf'
+  | 'deer'
+  | 'pronghorn'
+  | 'prairie-dog'
+  | 'bighorn-sheep'
+  | 'other';
 export type VehicleType = 'camper' | 'subaru';
 export type NpsSiteType =
   | 'mammoth-cave'
@@ -114,7 +125,12 @@ export function formatDateForDisplay(dateStr: string): string {
 /**
  * Filter photos based on current filter settings
  */
-export function filterPhotos(photos: Photo[], filters: PhotoFilters, _yellowstoneStart: string, _yellowstoneEnd: string): Photo[] {
+export function filterPhotos(
+  photos: Photo[],
+  filters: PhotoFilters,
+  _yellowstoneStart: string,
+  _yellowstoneEnd: string,
+): Photo[] {
   return photos.filter((photo) => {
     // Must have GPS coordinates to show on map
     if (photo.lat === null || photo.lng === null) {

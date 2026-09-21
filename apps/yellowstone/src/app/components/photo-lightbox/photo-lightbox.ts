@@ -1,11 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  input,
-  output,
-  HostListener,
-  computed,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Photo, GeothermalType, WildlifeType, VehicleType, NpsSiteType, AttractionType } from '../../data/photos';
 
