@@ -1,5 +1,10 @@
-/* Global styles for fuel-tracker. Plain CSS: Tailwind v4 must not go through Sass. */
+/* Global styles for yellowstone. Plain CSS: Tailwind v4 must not go through Sass. */
 @import '../../../libs/ui/src/styles/theme.css';
+
+/* Leaflet map styles */
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 /* Tailwind class scanning (automatic detection is disabled in the shared theme). */
 @source './';

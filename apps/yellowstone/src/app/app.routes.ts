@@ -4,7 +4,11 @@ export const appRoutes: Route[] = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'fuel',
+    redirectTo: 'photos',
+  },
+  {
+    path: 'photos',
+    loadComponent: () => import('./pages/photos/photos').then((m) => m.Photos),
   },
   {
     path: 'fuel',
